@@ -313,13 +313,62 @@ const defaultAuditLogs: AuditLog[] = [
   }
 ];
 
+// CRIAÇÃO E POVOAMENTO AUTOMÁTICO DO BANCO NEON POSTGRES NA VERCEL
+let isNeonInitialized = false;
+
+async function initNeonTables() {
+  if (isNeonInitialized) return;
+  try {
+    // Criar tabela se não existir
+    await sql`
+      CREATE TABLE IF NOT EXISTS products (
+        id VARCHAR(255) PRIMARY KEY,
+        sku VARCHAR(255),
+        tipo VARCHAR(50),
+        marca VARCHAR(255),
+        modelo VARCHAR(255),
+        amperagem NUMERIC,
+        voltagem VARCHAR(50),
+        cca NUMERIC,
+        polo VARCHAR(50),
+        aplicacao VARCHAR(100),
+        tecnologia VARCHAR(50),
+        saude_pct NUMERIC,
+        garantia_meses NUMERIC,
+        preco_custo NUMERIC,
+        preco_venda NUMERIC,
+        estoque NUMERIC,
+        estoque_minimo NUMERIC,
+        descricao TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    const countRes = await sql`SELECT COUNT(*) as count FROM products`;
+    if (countRes && Number(countRes[0].count) === 0) {
+      console.log('Populando tabela products do Neon DB com os 70+ produtos...');
+      for (const p of allProducts) {
+        await sql`
+          INSERT INTO products (
+            id, sku, tipo, marca, modelo, amperagem, voltagem, cca, polo, aplicacao, tecnologia, saude_pct, garantia_meses, preco_custo, preco_venda, estoque, estoque_minimo, descricao, created_at
+          ) VALUES (
+            ${p.id}, ${p.codigoSKU || ''}, ${p.tipo}, ${p.marca}, ${p.modelo}, ${p.amperagem}, ${p.voltagem}, ${p.cca}, ${p.polo}, ${p.aplicacao}, ${p.tecnologia}, ${p.saudePct}, ${p.garantiaMeses}, ${p.precoCusto}, ${p.precoVenda}, ${p.estoque}, ${p.estoqueMinimo}, ${p.descricao}, ${p.createdAt}
+          ) ON CONFLICT (id) DO NOTHING;
+        `;
+      }
+    }
+    isNeonInitialized = true;
+  } catch (err) {
+    console.error('Inicialização do Neon DB:', err);
+  }
+}
+
 function loadLocalData() {
   try {
     if (fs.existsSync(DB_FILE)) {
       const raw = fs.readFileSync(DB_FILE, 'utf-8');
       const data = JSON.parse(raw);
 
-      // Garantir que a conta admin@jmixbaterias.com.br sempre seja ADMIN
       if (data.users && Array.isArray(data.users)) {
         const adminIdx = data.users.findIndex((u: any) => u.email.toLowerCase() === 'admin@jmixbaterias.com.br');
         if (adminIdx > -1) {
@@ -331,7 +380,7 @@ function loadLocalData() {
 
       return {
         users: data.users || defaultUsers,
-        products: data.products || allProducts,
+        products: data.products && data.products.length > 0 ? data.products : allProducts,
         sales: data.sales || defaultSales,
         auditLogs: data.auditLogs || defaultAuditLogs
       };
@@ -361,6 +410,36 @@ function saveLocalData(data: any) {
 export const db = {
   // PRODUTOS
   async getProducts(tipo?: TipoProduto): Promise<Product[]> {
+    try {
+      await initNeonTables();
+      const res = await sql`SELECT * FROM products ORDER BY created_at DESC`;
+      if (res && res.length > 0) {
+        const prods: Product[] = res.map((r: any) => ({
+          id: r.id,
+          codigoSKU: r.sku,
+          tipo: r.tipo,
+          marca: r.marca,
+          modelo: r.modelo,
+          amperagem: Number(r.amperagem),
+          voltagem: r.voltagem,
+          cca: Number(r.cca),
+          polo: r.polo,
+          aplicacao: r.aplicacao,
+          tecnologia: r.tecnologia,
+          saudePct: Number(r.saude_pct),
+          garantiaMeses: Number(r.garantia_meses),
+          precoCusto: Number(r.preco_custo),
+          precoVenda: Number(r.preco_venda),
+          estoque: Number(r.estoque),
+          estoqueMinimo: Number(r.estoque_minimo),
+          descricao: r.descricao || '',
+          createdAt: r.created_at
+        }));
+        if (!tipo) return prods;
+        return prods.filter((p: Product) => p.tipo === tipo);
+      }
+    } catch (err) {}
+
     const data = loadLocalData();
     if (!tipo) return data.products;
     return data.products.filter((p: Product) => p.tipo === tipo);
@@ -372,12 +451,24 @@ export const db = {
   },
 
   async saveProduct(product: Omit<Product, 'id' | 'createdAt'>): Promise<Product> {
-    const data = loadLocalData();
     const newProduct: Product = {
       ...product,
       id: 'prod-' + Date.now(),
       createdAt: new Date().toISOString()
     };
+
+    try {
+      await initNeonTables();
+      await sql`
+        INSERT INTO products (
+          id, sku, tipo, marca, modelo, amperagem, voltagem, cca, polo, aplicacao, tecnologia, saude_pct, garantia_meses, preco_custo, preco_venda, estoque, estoque_minimo, descricao, created_at
+        ) VALUES (
+          ${newProduct.id}, ${newProduct.codigoSKU || ''}, ${newProduct.tipo}, ${newProduct.marca}, ${newProduct.modelo}, ${newProduct.amperagem}, ${newProduct.voltagem}, ${newProduct.cca}, ${newProduct.polo}, ${newProduct.aplicacao}, ${newProduct.tecnologia}, ${newProduct.saudePct}, ${newProduct.garantiaMeses}, ${newProduct.precoCusto}, ${newProduct.precoVenda}, ${newProduct.estoque}, ${newProduct.estoqueMinimo}, ${newProduct.descricao}, ${newProduct.createdAt}
+        );
+      `;
+    } catch (err) {}
+
+    const data = loadLocalData();
     data.products.unshift(newProduct);
     saveLocalData(data);
     return newProduct;
@@ -386,17 +477,28 @@ export const db = {
   async updateProduct(id: string, product: Partial<Product>): Promise<Product | null> {
     const data = loadLocalData();
     const idx = data.products.findIndex((p: Product) => p.id === id);
-    if (idx === -1) return null;
-    
-    data.products[idx] = {
-      ...data.products[idx],
-      ...product
-    };
-    saveLocalData(data);
-    return data.products[idx];
+    if (idx !== -1) {
+      data.products[idx] = {
+        ...data.products[idx],
+        ...product
+      };
+      saveLocalData(data);
+    }
+
+    try {
+      if (product.estoque !== undefined) {
+        await sql`UPDATE products SET estoque = ${product.estoque} WHERE id = ${id}`;
+      }
+    } catch (err) {}
+
+    return data.products[idx] || null;
   },
 
   async deleteProduct(id: string): Promise<boolean> {
+    try {
+      await sql`DELETE FROM products WHERE id = ${id}`;
+    } catch (err) {}
+
     const data = loadLocalData();
     const initialLen = data.products.length;
     data.products = data.products.filter((p: Product) => p.id !== id);
@@ -442,6 +544,11 @@ export const db = {
       }
 
       data.products[prodIdx].estoque -= item.quantidade;
+      
+      // Atualizar também no Neon Postgres
+      try {
+        await sql`UPDATE products SET estoque = ${data.products[prodIdx].estoque} WHERE id = ${product.id}`;
+      } catch (err) {}
 
       const itemSubtotal = product.precoVenda * item.quantidade;
       subtotal += itemSubtotal;
