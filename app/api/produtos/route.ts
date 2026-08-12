@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   const tipo = searchParams.get('tipo') as TipoProduto | null;
 
   const products = await db.getProducts(tipo || undefined);
-  return NextResponse.json({ products });
+  return NextResponse.json(products);
 }
 
 export async function POST(req: Request) {
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       `Produto ${product.marca} ${product.modelo} (${product.tipo}) cadastrado por ${session.nome}.`
     );
 
-    return NextResponse.json({ product }, { status: 201 });
+    return NextResponse.json(product, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Erro ao cadastrar produto' }, { status: 500 });
   }

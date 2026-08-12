@@ -33,12 +33,20 @@ export default function DashboardPage() {
       
       if (resProds.ok) {
         const dataProds = await resProds.json();
-        if (Array.isArray(dataProds)) setProducts(dataProds);
+        if (Array.isArray(dataProds)) {
+          setProducts(dataProds);
+        } else if (Array.isArray(dataProds.products)) {
+          setProducts(dataProds.products);
+        }
       }
       
       if (resSales.ok) {
         const dataSales = await resSales.json();
-        if (Array.isArray(dataSales)) setSales(dataSales);
+        if (Array.isArray(dataSales)) {
+          setSales(dataSales);
+        } else if (Array.isArray(dataSales.sales)) {
+          setSales(dataSales.sales);
+        }
       }
     } catch (err) {
       console.error('Erro ao carregar dados do dashboard:', err);

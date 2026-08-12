@@ -12,10 +12,7 @@ import {
   Plus, 
   Filter, 
   Edit, 
-  Trash2, 
-  AlertCircle, 
-  CheckCircle,
-  Eye
+  Trash2
 } from 'lucide-react';
 
 export default function EstoquePage() {
@@ -40,9 +37,13 @@ export default function EstoquePage() {
       if (resMe.ok) setSessionUser(await resMe.json());
       if (resProds.ok) {
         const dataProds = await resProds.json();
+        let list: Product[] = [];
         if (Array.isArray(dataProds)) {
-          setProducts(dataProds.filter(p => p.tipo === 'NOVA'));
+          list = dataProds;
+        } else if (Array.isArray(dataProds.products)) {
+          list = dataProds.products;
         }
+        setProducts(list.filter(p => p.tipo === 'NOVA'));
       }
     } catch (err) {
       console.error('Erro ao buscar baterias:', err);
@@ -58,15 +59,15 @@ export default function EstoquePage() {
   const safeProducts = Array.isArray(products) ? products : [];
   const isAdmin = sessionUser?.role === 'ADMIN';
 
-  const marcasDisponiveis = ['TODAS', ...Array.from(new Set(safeProducts.map(p => p.marca.toUpperCase())))];
+  const marcasDisponiveis = ['TODAS', ...Array.from(new Set(safeProducts.map(p => p.marca ? p.marca.toUpperCase() : '')))].filter(Boolean);
 
   const filteredProducts = safeProducts.filter(p => {
-    const matchesSearch = p.marca.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          p.modelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          p.amperagem.toString().includes(searchTerm) ||
+    const matchesSearch = (p.marca && p.marca.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                          (p.modelo && p.modelo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                          (p.amperagem && p.amperagem.toString().includes(searchTerm)) ||
                           (p.codigoSKU && p.codigoSKU.includes(searchTerm));
     
-    const matchesBrand = brandFilter === 'TODAS' || p.marca.toUpperCase().includes(brandFilter);
+    const matchesBrand = brandFilter === 'TODAS' || (p.marca && p.marca.toUpperCase().includes(brandFilter));
     return matchesSearch && matchesBrand;
   });
 
