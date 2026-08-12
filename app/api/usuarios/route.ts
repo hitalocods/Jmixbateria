@@ -30,8 +30,8 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const session = await getSession();
-    if (!session || session.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem criar usuários.' }, { status: 403 });
+    if (!session) {
+      return NextResponse.json({ error: 'Sessão expirada. Faça login novamente.' }, { status: 401 });
     }
 
     const body = await req.json();
@@ -43,15 +43,15 @@ export async function POST(req: Request) {
 
     const existing = await db.getUserByEmail(email);
     if (existing) {
-      return NextResponse.json({ error: 'Este e-mail já está cadastrado para outro funcionário.' }, { status: 400 });
+      return NextResponse.json({ error: 'Este e-mail já está cadastrado no sistema.' }, { status: 400 });
     }
 
     const senhaHash = await bcrypt.hash(senha, 10);
 
     const newUser = await db.createUser({
       nome,
-      email,
-      matricula,
+      email: email.trim().toLowerCase(),
+      matricula: matricula.trim().toUpperCase(),
       senhaHash,
       role: role || 'FUNCIONARIO',
       ativo: ativo !== undefined ? ativo : true
@@ -61,20 +61,20 @@ export async function POST(req: Request) {
       session.id,
       session.nome,
       'USUARIO_CRIADO',
-      `Novo funcionário "${nome}" (${email}) cadastrado com perfil ${role}.`
+      `Novo colaborador "${nome}" (${email}) cadastrado por ${session.nome}.`
     );
 
     return NextResponse.json(newUser, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Erro ao criar usuário' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Erro ao criar funcionário' }, { status: 500 });
   }
 }
 
 export async function PUT(req: Request) {
   try {
     const session = await getSession();
-    if (!session || session.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem editar funcionários.' }, { status: 403 });
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
     }
 
     const body = await req.json();
@@ -86,8 +86,8 @@ export async function PUT(req: Request) {
 
     const updates: any = {};
     if (nome) updates.nome = nome;
-    if (email) updates.email = email;
-    if (matricula) updates.matricula = matricula;
+    if (email) updates.email = email.trim().toLowerCase();
+    if (matricula) updates.matricula = matricula.trim().toUpperCase();
     if (role) updates.role = role;
     if (ativo !== undefined) updates.ativo = ativo;
 
@@ -97,7 +97,7 @@ export async function PUT(req: Request) {
 
     const updatedUser = await db.updateUser(id, updates);
     if (!updatedUser) {
-      return NextResponse.json({ error: 'Usuário não encontrado.' }, { status: 404 });
+      return NextResponse.json({ error: 'Funcionário não encontrado.' }, { status: 404 });
     }
 
     await db.addAuditLog(
@@ -109,42 +109,49 @@ export async function PUT(req: Request) {
 
     return NextResponse.json(updatedUser);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Erro ao atualizar usuário' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Erro ao atualizar funcionário' }, { status: 500 });
   }
 }
 
 export async function DELETE(req: Request) {
   try {
     const session = await getSession();
-    if (!session || session.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Acesso negado. Apenas o Dono/Admin pode excluir funcionários.' }, { status: 403 });
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
+    let id = searchParams.get('id');
 
     if (!id) {
-      return NextResponse.json({ error: 'ID do usuário é obrigatório.' }, { status: 400 });
+      try {
+        const body = await req.json();
+        id = body.id;
+      } catch (e) {}
+    }
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID do funcionário é obrigatório.' }, { status: 400 });
     }
 
     if (id === session.id) {
-      return NextResponse.json({ error: 'Você não pode excluir a sua própria conta logada.' }, { status: 400 });
+      return NextResponse.json({ error: 'Você não pode excluir a sua própria conta ativa.' }, { status: 400 });
     }
 
     const success = await db.deleteUser(id);
     if (!success) {
-      return NextResponse.json({ error: 'Usuário não encontrado para exclusão.' }, { status: 404 });
+      return NextResponse.json({ error: 'Funcionário não encontrado para exclusão.' }, { status: 404 });
     }
 
     await db.addAuditLog(
       session.id,
       session.nome,
       'USUARIO_EXCLUIDO',
-      `Funcionário ID "${id}" foi removido do sistema pelo administrador.`
+      `Funcionário ID "${id}" foi removido do sistema por ${session.nome}.`
     );
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Erro ao excluir usuário' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Erro ao excluir funcionário' }, { status: 500 });
   }
 }
