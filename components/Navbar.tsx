@@ -35,9 +35,11 @@ export default function Navbar({ user, sessionUser, onPOSOpen, onOpenPOS, onLogo
       try {
         const res = await fetch('/api/produtos');
         if (res.ok) {
-          const prods: Product[] = await res.json();
-          const critical = prods.filter(p => p.estoque === 1);
-          setCriticalProducts(critical);
+          const prods = await res.json();
+          if (Array.isArray(prods)) {
+            const critical = prods.filter(p => p.estoque === 1);
+            setCriticalProducts(critical);
+          }
         }
       } catch (err) {}
     };
@@ -59,10 +61,14 @@ export default function Navbar({ user, sessionUser, onPOSOpen, onOpenPOS, onLogo
 
   const handleInstallPWA = async () => {
     if (!installPrompt) return;
-    installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setInstallPrompt(null);
+    try {
+      installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setInstallPrompt(null);
+      }
+    } catch (err) {
+      console.log('PWA Prompt:', err);
     }
   };
 

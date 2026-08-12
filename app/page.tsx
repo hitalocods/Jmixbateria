@@ -4,18 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
 import POSModal from '@/components/POSModal';
-import { Product, Sale, User } from '@/lib/db';
+import { Product, Sale } from '@/lib/db';
 import { 
   DollarSign, 
-  TrendingUp, 
   Battery, 
   ShoppingBag, 
-  Users, 
-  AlertTriangle, 
-  ArrowUpRight, 
-  ShieldCheck, 
   Wrench,
-  BarChart2,
+  ShieldCheck, 
   Tag
 } from 'lucide-react';
 
@@ -35,8 +30,16 @@ export default function DashboardPage() {
       ]);
 
       if (resMe.ok) setSessionUser(await resMe.json());
-      if (resProds.ok) setProducts(await resProds.json());
-      if (resSales.ok) setSales(await resSales.json());
+      
+      if (resProds.ok) {
+        const dataProds = await resProds.json();
+        if (Array.isArray(dataProds)) setProducts(dataProds);
+      }
+      
+      if (resSales.ok) {
+        const dataSales = await resSales.json();
+        if (Array.isArray(dataSales)) setSales(dataSales);
+      }
     } catch (err) {
       console.error('Erro ao carregar dados do dashboard:', err);
     } finally {
@@ -52,36 +55,41 @@ export default function DashboardPage() {
 
   const isAdmin = sessionUser?.role === 'ADMIN';
 
-  // Métricas de Estoque
-  const totalBateriasNovas = products.filter(p => p.tipo === 'NOVA').reduce((acc, p) => acc + p.estoque, 0);
-  const totalBateriasSemiNovas = products.filter(p => p.tipo === 'SEMI_NOVA').reduce((acc, p) => acc + p.estoque, 0);
-  const estoquesCriticos = products.filter(p => p.estoque <= p.estoqueMinimo);
+  // Garantir que prods e sales sejam arrays defensivos
+  const safeProducts = Array.isArray(products) ? products : [];
+  const safeSales = Array.isArray(sales) ? sales : [];
+
+  // Métricas de Estoque Defensivas
+  const totalBateriasNovas = safeProducts.filter(p => p.tipo === 'NOVA').reduce((acc, p) => acc + (p.estoque || 0), 0);
+  const totalBateriasSemiNovas = safeProducts.filter(p => p.tipo === 'SEMI_NOVA').reduce((acc, p) => acc + (p.estoque || 0), 0);
 
   // Estoque por Marca
   const marcasPrincipais = ['MOURA', 'HELIAR', 'BOSCH', 'KONDOR', 'ELETRAN', 'ZETTA', 'PIONEIRO', 'ONBAT'];
   const contagemPorMarca = marcasPrincipais.map(marca => {
-    const total = products
-      .filter(p => p.marca.toUpperCase().includes(marca))
-      .reduce((acc, p) => acc + p.estoque, 0);
+    const total = safeProducts
+      .filter(p => p.marca && p.marca.toUpperCase().includes(marca))
+      .reduce((acc, p) => acc + (p.estoque || 0), 0);
     return { marca, total };
   });
 
   // Métricas Financeiras para o DONO (ADMIN)
-  const totalFaturamento = sales.reduce((acc, s) => acc + s.total, 0);
-  const totalInstalacao = sales.reduce((acc, s) => acc + (s.valorInstalacao || 0), 0);
+  const totalFaturamento = safeSales.reduce((acc, s) => acc + (s.total || 0), 0);
+  const totalInstalacao = safeSales.reduce((acc, s) => acc + (s.valorInstalacao || 0), 0);
   
   // Lucro líquido estimado (Apenas ADMIN)
   let lucroTotal = 0;
   if (isAdmin) {
-    sales.forEach(sale => {
+    safeSales.forEach(sale => {
       let custoVenda = 0;
-      sale.itens.forEach(item => {
-        const prod = products.find(p => p.id === item.produtoId);
-        if (prod) {
-          custoVenda += prod.precoCusto * item.quantidade;
-        }
-      });
-      lucroTotal += (sale.total - custoVenda);
+      if (Array.isArray(sale.itens)) {
+        sale.itens.forEach(item => {
+          const prod = safeProducts.find(p => p.id === item.produtoId);
+          if (prod) {
+            custoVenda += (prod.precoCusto || 0) * item.quantidade;
+          }
+        });
+      }
+      lucroTotal += ((sale.total || 0) - custoVenda);
     });
   }
 
@@ -147,7 +155,7 @@ export default function DashboardPage() {
               <p className="text-[11px] text-slate-400 mt-1">Recondicionadas / Com garantia</p>
             </div>
 
-            {/* Card 3: Faturamento Bruto (Apenas DONO/ADMIN vê valor financeiro) */}
+            {/* Card 3: Faturamento Bruto */}
             <div className="rounded-2xl border border-[#1e3256] bg-[#0a1120] p-5 shadow-lg">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Faturamento Bruto</span>
@@ -158,17 +166,17 @@ export default function DashboardPage() {
               {isAdmin ? (
                 <>
                   <p className="text-2xl md:text-3xl font-black text-emerald-400 mt-3">R$ {totalFaturamento.toFixed(2)}</p>
-                  <p className="text-[11px] text-slate-400 mt-1">{sales.length} vendas registradas</p>
+                  <p className="text-[11px] text-slate-400 mt-1">{safeSales.length} vendas registradas</p>
                 </>
               ) : (
                 <>
-                  <p className="text-2xl font-black text-slate-300 mt-3">{sales.length} <span className="text-xs font-normal text-slate-400">vendas</span></p>
+                  <p className="text-2xl font-black text-slate-300 mt-3">{safeSales.length} <span className="text-xs font-normal text-slate-400">vendas</span></p>
                   <p className="text-[11px] text-[#004b9a] font-bold mt-1">Registradas no balcão</p>
                 </>
               )}
             </div>
 
-            {/* Card 4: Taxas de Instalação (Apenas DONO vê total de mão de obra) */}
+            {/* Card 4: Taxas de Instalação */}
             <div className="rounded-2xl border border-[#1e3256] bg-[#0a1120] p-5 shadow-lg">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Instalações</span>
@@ -184,7 +192,7 @@ export default function DashboardPage() {
               ) : (
                 <>
                   <p className="text-2xl font-black text-purple-400 mt-3">
-                    {sales.filter(s => (s.valorInstalacao || 0) > 0).length} <span className="text-xs font-normal text-slate-400">serviços</span>
+                    {safeSales.filter(s => (s.valorInstalacao || 0) > 0).length} <span className="text-xs font-normal text-slate-400">serviços</span>
                   </p>
                   <p className="text-[11px] text-slate-400 mt-1">Instalações em veículos</p>
                 </>
@@ -247,11 +255,11 @@ export default function DashboardPage() {
               <span className="text-xs text-slate-400">Atualização em tempo real (3s)</span>
             </div>
 
-            {sales.length === 0 ? (
+            {safeSales.length === 0 ? (
               <p className="text-xs text-slate-400 py-6 text-center">Nenhuma venda registrada ainda hoje.</p>
             ) : (
               <div className="divide-y divide-[#1e3256]">
-                {sales.slice(0, 5).map(venda => (
+                {safeSales.slice(0, 5).map(venda => (
                   <div key={venda.id} className="py-3.5 flex items-center justify-between text-xs">
                     <div>
                       <div className="flex items-center gap-2">
@@ -259,7 +267,7 @@ export default function DashboardPage() {
                         <span className="rounded bg-[#111d33] px-2 py-0.5 font-semibold text-slate-300 border border-[#1e3256]">
                           {venda.formaPagamento}
                         </span>
-                        {venda.valorInstalacao > 0 && (
+                        {(venda.valorInstalacao || 0) > 0 && (
                           <span className="rounded bg-purple-950 px-2 py-0.5 font-bold text-purple-300 border border-purple-800">
                             + Instalação R$ {venda.valorInstalacao.toFixed(2)}
                           </span>
