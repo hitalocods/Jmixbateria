@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-main: #0a1120;
+    --bg-card: #111d33;
+    --bg-card-hover: #182846;
+    --border-color: #1e3256;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    
+    --jmix-blue: #004b9a;
+    --jmix-blue-light: #0262c7;
+    --jmix-red: #e51b24;
+    --jmix-red-dark: #b81018;
+    --jmix-orange: #f99b1c;
+    --jmix-amber: #f36f21;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    min-height: 100vh;
+  }
+}
+
+/* Glassmorphism Card Style */
+.jmix-glass {
+  background: rgba(17, 29, 51, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 50, 86, 0.7);
+}
+
+.jmix-glass-hover {
+  transition: all 0.2s ease-in-out;
+}
+.jmix-glass-hover:hover {
+  background: rgba(24, 40, 70, 0.9);
+  border-color: rgba(0, 98, 199, 0.5);
+  box-shadow: 0 8px 24px -4px rgba(0, 75, 154, 0.25);
+}
+
+/* Custom Gradients */
+.bg-jmix-gradient {
+  background: linear-gradient(135deg, #004b9a 0%, #0262c7 50%, #0a192f 100%);
+}
+
+.bg-lightning-gradient {
+  background: linear-gradient(135deg, #f99b1c 0%, #f36f21 100%);
+}
+
+.bg-red-24h-gradient {
+  background: linear-gradient(135deg, #e51b24 0%, #b81018 100%);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a1120;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e3256;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #004b9a;
+}
