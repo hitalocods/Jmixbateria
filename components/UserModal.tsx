@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, UserPlus, AlertCircle } from 'lucide-react';
+import { X, UserPlus, Shield, AlertCircle, Key, Mail, BadgeCheck } from 'lucide-react';
 import { User, Role } from '@/lib/db';
 
 interface UserModalProps {
@@ -22,24 +22,24 @@ export default function UserModal({
   const [matricula, setMatricula] = useState('');
   const [senha, setSenha] = useState('');
   const [role, setRole] = useState<Role>('FUNCIONARIO');
-  const [ativo, setAtivo] = useState(true);
+  const [ativo, setAtivo] = useState<boolean>(true);
 
   const [saving, setSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     if (userToEdit) {
-      setNome(userToEdit.nome);
-      setEmail(userToEdit.email);
-      setMatricula(userToEdit.matricula);
-      setSenha('');
-      setRole(userToEdit.role);
-      setAtivo(userToEdit.ativo);
+      setNome(userToEdit.nome || '');
+      setEmail(userToEdit.email || '');
+      setMatricula(userToEdit.matricula || '');
+      setSenha(''); // Senha vazia no edit = mantém anterior
+      setRole(userToEdit.role || 'FUNCIONARIO');
+      setAtivo(userToEdit.ativo !== false);
     } else {
       setNome('');
       setEmail('');
-      setMatricula(`FUN${Math.floor(100 + Math.random() * 900)}`);
-      setSenha('');
+      setMatricula('');
+      setSenha('123456');
       setRole('FUNCIONARIO');
       setAtivo(true);
     }
@@ -48,13 +48,13 @@ export default function UserModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nome || !email) {
-      setErrorMsg('Nome e E-mail são obrigatórios.');
+    if (!nome || !email || !matricula) {
+      setErrorMsg('Preencha o Nome, E-mail e a Matrícula/Código do funcionário.');
       return;
     }
 
-    if (!userToEdit && !senha) {
-      setErrorMsg('Defina uma senha inicial para o novo funcionário.');
+    if (!userToEdit && (!senha || senha.length < 4)) {
+      setErrorMsg('Informe uma senha válida com pelo menos 4 caracteres.');
       return;
     }
 
@@ -62,30 +62,35 @@ export default function UserModal({
     setErrorMsg('');
 
     try {
-      const payload = {
+      const payload: any = {
         id: userToEdit?.id,
         nome,
         email,
         matricula,
-        senha: senha || undefined,
         role,
         ativo
       };
 
+      if (senha && senha.trim().length > 0) {
+        payload.senha = senha;
+      }
+
+      const url = '/api/usuarios';
       const method = userToEdit ? 'PUT' : 'POST';
-      const res = await fetch('/api/usuarios', {
+
+      const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erro ao salvar usuário');
+      if (!res.ok) throw new Error(data.error || 'Erro ao salvar funcionário');
 
       onSaved();
       onClose();
     } catch (err: any) {
-      setErrorMsg(err.message || 'Erro inesperado');
+      setErrorMsg(err.message || 'Erro inesperado.');
     } finally {
       setSaving(false);
     }
@@ -95,7 +100,7 @@ export default function UserModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-      <div className="relative max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-[#1e3256] bg-[#0a1120] p-6 shadow-2xl">
+      <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-[#1e3256] bg-[#0a1120] p-6 shadow-2xl">
         
         <div className="flex items-center justify-between border-b border-[#1e3256] pb-4 mb-4">
           <div className="flex items-center gap-3">
@@ -104,9 +109,9 @@ export default function UserModal({
             </div>
             <div>
               <h2 className="text-lg font-bold text-white">
-                {userToEdit ? 'Editar Funcionário' : 'Cadastrar Novo Funcionário'}
+                {userToEdit ? 'Editar Funcionário' : 'Novo Funcionário'}
               </h2>
-              <p className="text-xs text-slate-400">Gerenciar acesso de balcão e administração.</p>
+              <p className="text-xs text-slate-400">Configure os acessos ao sistema de vendas.</p>
             </div>
           </div>
           <button onClick={onClose} className="rounded-lg p-1.5 text-slate-400 hover:text-white">
@@ -126,7 +131,7 @@ export default function UserModal({
             <label className="block font-semibold text-slate-300 mb-1">Nome Completo *</label>
             <input
               type="text"
-              placeholder="Ex: Carlos Eduardo"
+              placeholder="Ex: Carlos Eduardo (Balcão)"
               value={nome}
               onChange={e => setNome(e.target.value)}
               className="w-full rounded-lg border border-[#1e3256] bg-[#111d33] p-2.5 text-white"
@@ -135,66 +140,83 @@ export default function UserModal({
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-300 mb-1">E-mail Corporativo *</label>
-            <input
-              type="email"
-              placeholder="carlos@jmixbaterias.com.br"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-[#1e3256] bg-[#111d33] p-2.5 text-white"
-              required
-            />
+            <label className="block font-semibold text-slate-300 mb-1">E-mail de Acesso *</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+              <input
+                type="email"
+                placeholder="carlos@jmixbaterias.com.br"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full rounded-lg border border-[#1e3256] bg-[#111d33] py-2.5 pl-9 pr-3 text-white"
+                required
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-semibold text-slate-300 mb-1">Matrícula</label>
-              <input
-                type="text"
-                value={matricula}
-                onChange={e => setMatricula(e.target.value)}
-                className="w-full rounded-lg border border-[#1e3256] bg-[#111d33] p-2.5 text-white font-mono"
-              />
+              <label className="block font-semibold text-slate-300 mb-1">Matrícula / Código *</label>
+              <div className="relative">
+                <BadgeCheck className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="FUN003"
+                  value={matricula}
+                  onChange={e => setMatricula(e.target.value)}
+                  className="w-full rounded-lg border border-[#1e3256] bg-[#111d33] py-2.5 pl-9 pr-3 text-white uppercase font-bold"
+                  required
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-300 mb-1">Cargo / Função</label>
-              <select
-                value={role}
-                onChange={e => setRole(e.target.value as Role)}
-                className="w-full rounded-lg border border-[#1e3256] bg-[#111d33] p-2.5 text-white font-bold"
-              >
-                <option value="FUNCIONARIO">Funcionário / Vendedor</option>
-                <option value="ADMIN">Administrador / Gerente</option>
-              </select>
+              <label className="block font-semibold text-slate-300 mb-1">Perfil de Acesso</label>
+              <div className="relative">
+                <Shield className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                <select
+                  value={role}
+                  onChange={e => setRole(e.target.value as Role)}
+                  className="w-full rounded-lg border border-[#1e3256] bg-[#111d33] py-2.5 pl-9 pr-3 text-white"
+                >
+                  <option value="FUNCIONARIO">Funcionário (Vendedor/Balcão)</option>
+                  <option value="ADMIN">Dono / Administrador</option>
+                </select>
+              </div>
             </div>
           </div>
 
           <div>
             <label className="block font-semibold text-slate-300 mb-1">
-              {userToEdit ? 'Nova Senha (deixe em branco se não for alterar)' : 'Senha Inicial *'}
+              {userToEdit ? 'Nova Senha (deixe em branco para não alterar)' : 'Senha de Acesso *'}
             </label>
-            <input
-              type="password"
-              placeholder="Mínimo 6 caracteres"
-              value={senha}
-              onChange={e => setSenha(e.target.value)}
-              className="w-full rounded-lg border border-[#1e3256] bg-[#111d33] p-2.5 text-white"
-            />
+            <div className="relative">
+              <Key className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+              <input
+                type="password"
+                placeholder={userToEdit ? '••••••••' : 'Digite a senha do funcionário'}
+                value={senha}
+                onChange={e => setSenha(e.target.value)}
+                className="w-full rounded-lg border border-[#1e3256] bg-[#111d33] py-2.5 pl-9 pr-3 text-white"
+                required={!userToEdit}
+              />
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 pt-2">
-            <input
-              type="checkbox"
-              id="user-ativo"
-              checked={ativo}
-              onChange={e => setAtivo(e.target.checked)}
-              className="h-4 w-4 rounded accent-[#004b9a]"
-            />
-            <label htmlFor="user-ativo" className="font-semibold text-slate-300 cursor-pointer">
-              Conta ativa (Permite efetuar login no sistema)
-            </label>
-          </div>
+          {userToEdit && (
+            <div className="flex items-center gap-2 rounded-lg bg-[#111d33] border border-[#1e3256] p-3">
+              <input
+                type="checkbox"
+                id="ativoCheck"
+                checked={ativo}
+                onChange={e => setAtivo(e.target.checked)}
+                className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-[#004b9a]"
+              />
+              <label htmlFor="ativoCheck" className="text-xs font-medium text-slate-300 cursor-pointer">
+                Conta ativa (permite fazer login no sistema)
+              </label>
+            </div>
+          )}
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#1e3256]">
             <button
@@ -209,7 +231,7 @@ export default function UserModal({
               disabled={saving}
               className="rounded-lg bg-gradient-to-r from-[#004b9a] to-[#0262c7] px-5 py-2 font-bold text-white shadow-md hover:brightness-110"
             >
-              {saving ? 'SALVANDO...' : 'SALVAR FUNCIONÁRIO'}
+              {saving ? 'SALVANDO...' : userToEdit ? 'SALVAR ALTERAÇÕES' : 'CRIAR FUNCIONÁRIO'}
             </button>
           </div>
         </form>

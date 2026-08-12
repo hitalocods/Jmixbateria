@@ -2,168 +2,117 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import {
-  LayoutDashboard,
-  Battery,
-  Sparkles,
-  ShoppingBag,
-  BarChart3,
-  Users,
-  ShieldCheck,
-  UserCheck
+import { 
+  LayoutDashboard, 
+  Battery, 
+  Zap, 
+  ShoppingBag, 
+  BarChart3, 
+  Users, 
+  ShieldCheck, 
+  UserCheck 
 } from 'lucide-react';
-import { SessionUser } from '@/lib/auth';
+import { Role } from '@/lib/db';
 
 interface SidebarProps {
-  user: SessionUser | null;
+  role?: Role;
+  user?: any;
+  activePath?: string;
 }
 
-export default function Sidebar({ user }: SidebarProps) {
-  const pathname = usePathname();
-  const isAdmin = user?.role === 'ADMIN';
+export default function Sidebar({ role, user, activePath = '' }: SidebarProps) {
+  const currentRole = role || user?.role || 'FUNCIONARIO';
+  const isAdmin = currentRole === 'ADMIN';
 
   const navItems = [
-    {
-      label: 'Visão Geral & Estoque',
-      href: '/',
-      icon: LayoutDashboard,
-      roles: ['ADMIN', 'FUNCIONARIO']
-    },
-    {
-      label: 'Baterias Novas',
-      href: '/estoque',
-      icon: Battery,
-      badge: 'Novas',
-      roles: ['ADMIN', 'FUNCIONARIO']
-    },
-    {
-      label: 'Semi-Novas',
-      href: '/semi-novas',
-      icon: Sparkles,
-      badge: 'Usadas',
-      roles: ['ADMIN', 'FUNCIONARIO']
-    },
-    {
-      label: 'Histórico de Vendas',
-      href: '/vendas',
-      icon: ShoppingBag,
-      roles: ['ADMIN', 'FUNCIONARIO']
-    },
-    {
-      label: 'Faturamento & Margem',
-      href: '/relatorios',
-      icon: BarChart3,
-      adminOnly: true,
-      roles: ['ADMIN']
-    },
-    {
-      label: 'Gestão da Equipe',
-      href: '/usuarios',
-      icon: Users,
-      adminOnly: true,
-      roles: ['ADMIN']
-    }
+    { label: 'Painel Geral', href: '/', icon: LayoutDashboard, role: 'ALL' },
+    { label: 'Baterias Novas', href: '/estoque', icon: Battery, role: 'ALL' },
+    { label: 'Semi-Novas', href: '/semi-novas', icon: Zap, role: 'ALL' },
+    { label: 'Histórico de Vendas', href: '/vendas', icon: ShoppingBag, role: 'ALL' },
+    { label: 'Relatórios & Caixa', href: '/relatorios', icon: BarChart3, role: 'ADMIN' },
+    { label: 'Equipe & Funcionários', href: '/usuarios', icon: Users, role: 'ADMIN' },
   ];
 
-  const filteredItems = navItems.filter(item => {
-    if (item.adminOnly && !isAdmin) return false;
-    return true;
-  });
+  const visibleItems = navItems.filter(item => item.role === 'ALL' || (item.role === 'ADMIN' && isAdmin));
 
   return (
-    <aside className="w-full md:w-64 flex-shrink-0 bg-[#0a1120] border-r border-[#1e3256] p-4 flex flex-col justify-between">
-      <div className="space-y-5">
+    <>
+      {/* Sidebar Desktop */}
+      <aside className="hidden md:flex w-64 flex-col border-r border-[#1e3256] bg-[#0a1120] p-4 text-slate-300 min-h-[calc(100vh-65px)]">
         
-        {/* MENU DE NAVEGAÇÃO */}
-        <div>
-          <h2 className="px-3 text-[10px] font-black uppercase tracking-wider text-slate-400">
-            Navegação do Sistema
-          </h2>
-
-          <nav className="mt-2 space-y-1">
-            {filteredItems.map(item => {
-              const isActive = pathname === item.href;
-              const Icon = item.icon;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`group flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-bold transition-all ${
-                    isActive
-                      ? 'bg-gradient-to-r from-[#004b9a] to-[#0262c7] text-white shadow-md shadow-blue-950/40'
-                      : 'text-slate-300 hover:bg-[#111d33] hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon
-                      className={`h-4.5 w-4.5 transition-colors ${
-                        isActive
-                          ? 'text-[#f99b1c]'
-                          : 'text-slate-400 group-hover:text-[#f99b1c]'
-                      }`}
-                    />
-                    <span>{item.label}</span>
-                  </div>
-
-                  {item.badge && (
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[9px] font-extrabold ${
-                        isActive
-                          ? 'bg-white/20 text-white'
-                          : 'bg-[#1e3256] text-slate-300'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-
-                  {item.adminOnly && (
-                    <span className="rounded bg-[#f99b1c]/20 px-1.5 py-0.5 text-[9px] font-black text-[#f99b1c] border border-[#f99b1c]/40">
-                      DONO
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* BOX EXPLICATIVO DE NÍVEIS DE ACESSO */}
-        <div className={`rounded-2xl border p-3.5 space-y-2 ${
-          isAdmin
-            ? 'border-[#f99b1c]/40 bg-gradient-to-br from-[#111d33] to-[#1a1400]/40'
-            : 'border-[#1e3256] bg-[#111d33]'
-        }`}>
-          <div className="flex items-center gap-2 text-xs font-black">
+        {/* Badge do Perfil Logado */}
+        <div className="mb-6 rounded-xl border border-[#1e3256] bg-[#111d33]/80 p-3.5 shadow-md">
+          <div className="flex items-center gap-2.5">
             {isAdmin ? (
-              <>
-                <ShieldCheck className="h-4 w-4 text-[#f99b1c]" />
-                <span className="text-[#f99b1c]">Perfil: Dono / Gerente</span>
-              </>
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-400">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
             ) : (
-              <>
-                <UserCheck className="h-4 w-4 text-blue-400" />
-                <span className="text-blue-400">Perfil: Funcionário</span>
-              </>
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/20 border border-blue-500/40 text-blue-400">
+                <UserCheck className="h-5 w-5" />
+              </div>
             )}
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Perfil Ativo</p>
+              <p className="text-sm font-black text-white">
+                {isAdmin ? 'Dono / Administrador' : 'Funcionário Balcão'}
+              </p>
+            </div>
           </div>
-
-          <p className="text-[11px] text-slate-400 leading-relaxed">
-            {isAdmin ? (
-              'Você possui acesso gerencial a preços de custo, margens de lucro, relatórios de vendas da equipe e cadastro de funcionários.'
-            ) : (
-              'Você possui acesso operacional ao balcão de vendas, consulta de estoque em tempo real e alerta de 1 unidade restante.'
-            )}
-          </p>
         </div>
 
-      </div>
+        {/* Menu de Navegação */}
+        <nav className="flex-1 space-y-1">
+          {visibleItems.map(item => {
+            const Icon = item.icon;
+            const isActive = activePath === item.href;
 
-      <div className="pt-4 border-t border-[#1e3256] text-center text-[10px] text-slate-500 font-semibold">
-        JMix Baterias 24h &copy; {new Date().getFullYear()}
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 rounded-xl px-3.5 py-3 text-xs font-bold transition-all ${
+                  isActive
+                    ? 'bg-gradient-to-r from-[#004b9a] to-[#0262c7] text-white shadow-lg shadow-[#004b9a]/30 scale-[1.02]'
+                    : 'text-slate-400 hover:bg-[#111d33] hover:text-white'
+                }`}
+              >
+                <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Rodapé Informativo */}
+        <div className="mt-auto border-t border-[#1e3256] pt-4 text-center">
+          <p className="text-[11px] font-bold text-slate-400">JMix Baterias 24h</p>
+          <p className="text-[10px] text-slate-500">Sistema Interno v2.0</p>
+        </div>
+      </aside>
+
+      {/* Bar de Navegação Mobile */}
+      <div className="flex md:hidden overflow-x-auto bg-[#0a1120] border-b border-[#1e3256] p-2 gap-2 scrollbar-none sticky top-[61px] z-30 shadow-md">
+        {visibleItems.map(item => {
+          const Icon = item.icon;
+          const isActive = activePath === item.href;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-bold transition-all ${
+                isActive
+                  ? 'bg-gradient-to-r from-[#004b9a] to-[#0262c7] text-white shadow-md'
+                  : 'bg-[#111d33] text-slate-300 border border-[#1e3256]'
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
       </div>
-    </aside>
+    </>
   );
 }

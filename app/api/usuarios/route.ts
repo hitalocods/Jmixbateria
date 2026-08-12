@@ -1,59 +1,72 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getSession, hashPassword } from '@/lib/auth';
+import { getSession } from '@/lib/auth';
+import bcrypt from 'bcryptjs';
 
-export async function GET() {
-  const session = await getSession();
-  if (!session || session.role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Apenas administradores podem ver os usuários.' }, { status: 403 });
+export async function GET(req: Request) {
+  try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
+    const users = await db.getUsers();
+    const safeUsers = users.map(u => ({
+      id: u.id,
+      nome: u.nome,
+      email: u.email,
+      matricula: u.matricula,
+      role: u.role,
+      ativo: u.ativo,
+      createdAt: u.createdAt
+    }));
+
+    return NextResponse.json(safeUsers);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Erro ao buscar usuários' }, { status: 500 });
   }
-
-  const users = await db.getUsers();
-  // Remover hash da resposta por segurança
-  const safeUsers = users.map(({ senhaHash, ...u }) => u);
-  return NextResponse.json({ users: safeUsers });
 }
 
 export async function POST(req: Request) {
   try {
     const session = await getSession();
     if (!session || session.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Apenas administradores podem cadastrar funcionários.' }, { status: 403 });
+      return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem criar usuários.' }, { status: 403 });
     }
 
     const body = await req.json();
+    const { nome, email, matricula, senha, role, ativo } = body;
 
-    if (!body.nome || !body.email || !body.senha) {
-      return NextResponse.json({ error: 'Nome, E-mail e Senha são obrigatórios.' }, { status: 400 });
+    if (!nome || !email || !matricula || !senha) {
+      return NextResponse.json({ error: 'Preencha Nome, Email, Matrícula e Senha.' }, { status: 400 });
     }
 
-    const existing = await db.getUserByEmail(body.email);
+    const existing = await db.getUserByEmail(email);
     if (existing) {
-      return NextResponse.json({ error: 'Já existe um usuário cadastrado com este e-mail.' }, { status: 400 });
+      return NextResponse.json({ error: 'Este e-mail já está cadastrado para outro funcionário.' }, { status: 400 });
     }
 
-    const senhaHash = await hashPassword(body.senha);
+    const senhaHash = await bcrypt.hash(senha, 10);
 
     const newUser = await db.createUser({
-      nome: body.nome,
-      email: body.email,
-      matricula: body.matricula || `FUN${Math.floor(100 + Math.random() * 900)}`,
+      nome,
+      email,
+      matricula,
       senhaHash,
-      role: body.role || 'FUNCIONARIO',
-      ativo: body.ativo !== false
+      role: role || 'FUNCIONARIO',
+      ativo: ativo !== undefined ? ativo : true
     });
 
     await db.addAuditLog(
       session.id,
       session.nome,
-      'USUARIO_CADASTRADO',
-      `Novo funcionário ${newUser.nome} (${newUser.role}) cadastrado por ${session.nome}.`
+      'USUARIO_CRIADO',
+      `Novo funcionário "${nome}" (${email}) cadastrado com perfil ${role}.`
     );
 
-    const { senhaHash: _, ...safeUser } = newUser;
-    return NextResponse.json({ user: safeUser }, { status: 201 });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Erro ao cadastrar funcionário' }, { status: 500 });
+    return NextResponse.json(newUser, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Erro ao criar usuário' }, { status: 500 });
   }
 }
 
@@ -61,32 +74,77 @@ export async function PUT(req: Request) {
   try {
     const session = await getSession();
     if (!session || session.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Apenas administradores podem alterar usuários.' }, { status: 403 });
+      return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem editar funcionários.' }, { status: 403 });
     }
 
     const body = await req.json();
-    const { id, senha, ...userData } = body;
+    const { id, nome, email, matricula, senha, role, ativo } = body;
 
-    const updateData: any = { ...userData };
-    if (senha && senha.trim()) {
-      updateData.senhaHash = await hashPassword(senha.trim());
+    if (!id) {
+      return NextResponse.json({ error: 'ID do usuário não fornecido.' }, { status: 400 });
     }
 
-    const updated = await db.updateUser(id, updateData);
-    if (!updated) {
-      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 404 });
+    const updates: any = {};
+    if (nome) updates.nome = nome;
+    if (email) updates.email = email;
+    if (matricula) updates.matricula = matricula;
+    if (role) updates.role = role;
+    if (ativo !== undefined) updates.ativo = ativo;
+
+    if (senha && senha.trim().length > 0) {
+      updates.senhaHash = await bcrypt.hash(senha, 10);
+    }
+
+    const updatedUser = await db.updateUser(id, updates);
+    if (!updatedUser) {
+      return NextResponse.json({ error: 'Usuário não encontrado.' }, { status: 404 });
     }
 
     await db.addAuditLog(
       session.id,
       session.nome,
-      'USUARIO_ATUALIZADO',
-      `Usuário ${updated.nome} atualizado por ${session.nome}.`
+      'USUARIO_EDITADO',
+      `Dados do funcionário "${updatedUser.nome}" (${updatedUser.email}) foram atualizados.`
     );
 
-    const { senhaHash: _, ...safeUser } = updated;
-    return NextResponse.json({ user: safeUser });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Erro ao atualizar usuário' }, { status: 500 });
+    return NextResponse.json(updatedUser);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Erro ao atualizar usuário' }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const session = await getSession();
+    if (!session || session.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Acesso negado. Apenas o Dono/Admin pode excluir funcionários.' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID do usuário é obrigatório.' }, { status: 400 });
+    }
+
+    if (id === session.id) {
+      return NextResponse.json({ error: 'Você não pode excluir a sua própria conta logada.' }, { status: 400 });
+    }
+
+    const success = await db.deleteUser(id);
+    if (!success) {
+      return NextResponse.json({ error: 'Usuário não encontrado para exclusão.' }, { status: 404 });
+    }
+
+    await db.addAuditLog(
+      session.id,
+      session.nome,
+      'USUARIO_EXCLUIDO',
+      `Funcionário ID "${id}" foi removido do sistema pelo administrador.`
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Erro ao excluir usuário' }, { status: 500 });
   }
 }

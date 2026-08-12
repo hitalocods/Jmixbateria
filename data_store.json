@@ -12,10 +12,10 @@
     },
     {
       "id": "usr-func-1",
-      "nome": "Carlos Eduardo (Balcão)",
-      "email": "carlos@jmixbaterias.com.br",
+      "nome": "Ytallo",
+      "email": "ytallo@gmail.com",
       "matricula": "FUN001",
-      "senhaHash": "$2a$10$fV3GjI4yC8r3i1j3K2/Z2.3K2L.g1tKxG3yZ7fA1uE9/S7.h0O.6",
+      "senhaHash": "$2b$10$A70LCdNz.ANDU472rbD24eC.7z9PSSPCVXDUiayHsLp/8B43NGCIa",
       "role": "FUNCIONARIO",
       "ativo": true,
       "createdAt": "2026-08-12T20:46:00.911Z"
@@ -1801,6 +1801,22 @@
     }
   ],
   "auditLogs": [
+    {
+      "id": "log-1786568756665",
+      "usuarioId": "usr-admin-1",
+      "usuarioNome": "Gerente JMix",
+      "acao": "USUARIO_EDITADO",
+      "detalhes": "Dados do funcionário \"Ytallo\" (ytallo@gmail.com) foram atualizados.",
+      "dataHora": "2026-08-12T21:05:56.665Z"
+    },
+    {
+      "id": "log-1786568694075",
+      "usuarioId": "usr-admin-1",
+      "usuarioNome": "Gerente JMix",
+      "acao": "LOGIN_USUARIO",
+      "detalhes": "Usuário Gerente JMix (ADMIN) efetuou login no sistema.",
+      "dataHora": "2026-08-12T21:04:54.075Z"
+    },
     {
       "id": "log-1786567870588",
       "usuarioId": "usr-func-1",

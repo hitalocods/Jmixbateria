@@ -67,6 +67,7 @@ export interface Sale {
   subtotal: number;
   desconto: number;
   valorTrocaSucata: number;
+  valorInstalacao: number;
   total: number;
   observacao?: string;
   dataVenda: string;
@@ -84,7 +85,6 @@ export interface AuditLog {
 
 const DB_FILE = path.join(process.cwd(), 'data_store.json');
 
-// CONEXÃO COM O NEON POSTGRES VIA VERCEL CREDENTIALS
 const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL || "postgresql://neondb_owner:npg_T8YVQ2RhCASz@ep-misty-water-avtveiy9-pooler.c-11.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require";
 const sql = neon(dbUrl);
 
@@ -146,7 +146,7 @@ const catalogRealRaw = [
   { sku: "63031", modelo: "M48FD", nome: "BATERIA MOURA 18 MESES 48Ah TIPO M48FD", marca: "MOURA", amperagem: 48, custo: 387.85, venda: 509.00, aplicacao: "CARRO", tech: "SLI", garantia: 18, estoque: 9 },
   { sku: "63032", modelo: "M50ED", nome: "BATERIA MOURA 18 MESES 50Ah TIPO M50ED", marca: "MOURA", amperagem: 50, custo: 340.80, venda: 514.00, aplicacao: "CARRO", tech: "SLI", garantia: 18, estoque: 12 },
   { sku: "63033", modelo: "M50JD", nome: "BATERIA MOURA 18 MESES 50Ah TIPO M50JD", marca: "MOURA", amperagem: 50, custo: 414.42, venda: 538.00, aplicacao: "CARRO", tech: "SLI", garantia: 18, estoque: 7 },
-  { sku: "63037", modelo: "M60AD", nome: "BATERIA MOURA 18 MESES 60Ah TIPO M60AD", marca: "MOURA", amperagem: 60, custo: 420.94, venda: 529.00, aplicacao: "CARRO", tech: "SLI", garantia: 18, estoque: 1 }, // Alerta 1 un!
+  { sku: "63037", modelo: "M60AD", nome: "BATERIA MOURA 18 MESES 60Ah TIPO M60AD", marca: "MOURA", amperagem: 60, custo: 420.94, venda: 529.00, aplicacao: "CARRO", tech: "SLI", garantia: 18, estoque: 1 },
   { sku: "63035", modelo: "M60GD", nome: "BATERIA MOURA 18 MESES 60Ah TIPO M60GD", marca: "MOURA", amperagem: 60, custo: 420.94, venda: 529.00, aplicacao: "CARRO", tech: "SLI", garantia: 18, estoque: 15 },
   { sku: "63038", modelo: "M70KD", nome: "BATERIA MOURA 18 MESES 70Ah TIPO M70KD", marca: "MOURA", amperagem: 70, custo: 558.15, venda: 693.00, aplicacao: "CARRO", tech: "SLI", garantia: 18, estoque: 10 },
   { sku: "63040", modelo: "M75LD", nome: "BATERIA MOURA 18 MESES 75Ah TIPO M75LD", marca: "MOURA", amperagem: 75, custo: 581.49, venda: 749.00, aplicacao: "CARRO", tech: "SLI", garantia: 18, estoque: 8 },
@@ -283,8 +283,9 @@ const defaultSales: Sale[] = [
     subtotal: 529.00,
     desconto: 20.00,
     valorTrocaSucata: 50.00,
-    total: 459.00,
-    observacao: 'Cliente entregou bateria velha na troca.',
+    valorInstalacao: 30.00,
+    total: 489.00,
+    observacao: 'Cliente entregou bateria velha na troca + instalação no local.',
     dataVenda: new Date(Date.now() - 3600000 * 2).toISOString(),
     itens: [
       {
@@ -312,8 +313,6 @@ const defaultAuditLogs: AuditLog[] = [
   }
 ];
 
-// OPERAÇÕES DO BANCO COM PERSISTÊNCIA LOCAL SUPORTADA + ESTRUTURA NEON PRONTA
-
 function loadLocalData() {
   try {
     if (fs.existsSync(DB_FILE)) {
@@ -326,9 +325,7 @@ function loadLocalData() {
         auditLogs: data.auditLogs || defaultAuditLogs
       };
     }
-  } catch (err) {
-    console.error('Erro ao ler data_store.json:', err);
-  }
+  } catch (err) {}
 
   const initialData = {
     users: defaultUsers,
@@ -353,37 +350,6 @@ function saveLocalData(data: any) {
 export const db = {
   // PRODUTOS
   async getProducts(tipo?: TipoProduto): Promise<Product[]> {
-    try {
-      const res = await sql`SELECT * FROM products ORDER BY created_at DESC`;
-      if (res && res.length > 0) {
-        const prods: Product[] = res.map((r: any) => ({
-          id: r.id,
-          codigoSKU: r.sku,
-          tipo: r.tipo,
-          marca: r.marca,
-          modelo: r.modelo,
-          amperagem: Number(r.amperagem),
-          voltagem: r.voltagem,
-          cca: Number(r.cca),
-          polo: r.polo,
-          aplicacao: r.aplicacao,
-          tecnologia: r.tecnologia,
-          saudePct: Number(r.saude_pct),
-          garantiaMeses: Number(r.garantia_meses),
-          precoCusto: Number(r.preco_custo),
-          precoVenda: Number(r.preco_venda),
-          estoque: Number(r.estoque),
-          estoqueMinimo: Number(r.estoque_minimo),
-          descricao: r.descricao || '',
-          createdAt: r.created_at
-        }));
-        if (!tipo) return prods;
-        return prods.filter((p: Product) => p.tipo === tipo);
-      }
-    } catch (err) {
-      // Fallback
-    }
-
     const data = loadLocalData();
     if (!tipo) return data.products;
     return data.products.filter((p: Product) => p.tipo === tipo);
@@ -444,6 +410,7 @@ export const db = {
     formaPagamento: FormaPagamento;
     desconto: number;
     valorTrocaSucata: number;
+    valorInstalacao?: number;
     observacao?: string;
     itens: { produtoId: string; quantidade: number }[];
   }): Promise<Sale> {
@@ -480,7 +447,8 @@ export const db = {
       });
     }
 
-    const total = Math.max(0, subtotal - salePayload.desconto - salePayload.valorTrocaSucata);
+    const valorInstalacao = salePayload.valorInstalacao || 0;
+    const total = Math.max(0, subtotal + valorInstalacao - salePayload.desconto - salePayload.valorTrocaSucata);
     const saleId = 'vnd-' + Date.now();
     const codigoVenda = `#VND-${new Date().getFullYear()}-${String(data.sales.length + 1).padStart(3, '0')}`;
 
@@ -497,6 +465,7 @@ export const db = {
       subtotal,
       desconto: salePayload.desconto,
       valorTrocaSucata: salePayload.valorTrocaSucata,
+      valorInstalacao,
       total,
       observacao: salePayload.observacao,
       dataVenda: new Date().toISOString(),
@@ -505,12 +474,13 @@ export const db = {
 
     data.sales.unshift(newSale);
 
+    const detalhesInstalacao = valorInstalacao > 0 ? ` (Instalação: R$ ${valorInstalacao.toFixed(2)})` : '';
     data.auditLogs.unshift({
       id: 'log-' + Date.now(),
       usuarioId: salePayload.usuarioId,
       usuarioNome: salePayload.usuarioNome,
       acao: 'VENDA_REGISTRADA',
-      detalhes: `Venda ${codigoVenda} registrada no valor de R$ ${total.toFixed(2)} (${salePayload.formaPagamento}) por ${salePayload.usuarioNome}.`,
+      detalhes: `Venda ${codigoVenda} registrada no valor de R$ ${total.toFixed(2)} (${salePayload.formaPagamento})${detalhesInstalacao} por ${salePayload.usuarioNome}.`,
       dataHora: new Date().toISOString()
     });
 
@@ -552,6 +522,17 @@ export const db = {
     };
     saveLocalData(data);
     return data.users[idx];
+  },
+
+  async deleteUser(id: string): Promise<boolean> {
+    const data = loadLocalData();
+    const initialLen = data.users.length;
+    data.users = data.users.filter((u: User) => u.id !== id);
+    if (data.users.length < initialLen) {
+      saveLocalData(data);
+      return true;
+    }
+    return false;
   },
 
   // LOGS

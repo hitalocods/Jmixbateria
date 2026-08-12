@@ -3,100 +3,119 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { LogOut, User as UserIcon, Zap, ShoppingCart, Crown, Download, AlertTriangle } from 'lucide-react';
-import { SessionUser } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
+import { 
+  LogOut, 
+  ShoppingCart, 
+  Download, 
+  AlertTriangle 
+} from 'lucide-react';
+import POSModal from './POSModal';
 import { Product } from '@/lib/db';
 
 interface NavbarProps {
-  user: SessionUser | null;
+  user?: any;
+  sessionUser?: any;
+  onPOSOpen?: () => void;
   onOpenPOS?: () => void;
-  onLogout?: () => void;
+  onLogout?: () => Promise<void>;
 }
 
-export default function Navbar({ user, onOpenPOS, onLogout }: NavbarProps) {
-  const isAdmin = user?.role === 'ADMIN';
+export default function Navbar({ user, sessionUser, onPOSOpen, onOpenPOS, onLogout }: NavbarProps) {
+  const router = useRouter();
+  const currentUser = sessionUser || user;
 
-  // PWA Install Prompt State
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [canInstallPWA, setCanInstallPWA] = useState(false);
-
-  // Real-time Critical Stock Alert (1 unit)
+  const [isPOSOpen, setIsPOSOpen] = useState(false);
   const [criticalProducts, setCriticalProducts] = useState<Product[]>([]);
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
-    // Handler para instalação do PWA no celular/desktop
+    const checkCriticalStock = async () => {
+      try {
+        const res = await fetch('/api/produtos');
+        if (res.ok) {
+          const prods: Product[] = await res.json();
+          const critical = prods.filter(p => p.estoque === 1);
+          setCriticalProducts(critical);
+        }
+      } catch (err) {}
+    };
+
+    checkCriticalStock();
+    const interval = setInterval(checkCriticalStock, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     const handleBeforeInstall = (e: any) => {
       e.preventDefault();
-      setDeferredPrompt(e);
-      setCanInstallPWA(true);
+      setInstallPrompt(e);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-
-    // Polling em tempo real (a cada 4 segundos) para verificar estoque crítico de 1 unidade!
-    const checkStockAlerts = async () => {
-      try {
-        const res = await fetch('/api/produtos');
-        const data = await res.json();
-        const prods: Product[] = data.products || [];
-        const critical = prods.filter(p => p.estoque === 1 || p.estoque === 0);
-        setCriticalProducts(critical);
-      } catch (err) {
-        // silencioso
-      }
-    };
-
-    checkStockAlerts();
-    const interval = setInterval(checkStockAlerts, 4000);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
-      clearInterval(interval);
-    };
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
   }, []);
 
   const handleInstallPWA = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setCanInstallPWA(false);
-      }
-      setDeferredPrompt(null);
-    } else {
-      alert('Para instalar na sua tela inicial:\n1. Clique nos três pontinhos ou ícone de compartilhar do seu navegador.\n2. Escolha "Adicionar à tela inicial" ou "Instalar Aplicativo".');
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setInstallPrompt(null);
     }
   };
 
+  const handleLogout = async () => {
+    if (onLogout) {
+      await onLogout();
+      return;
+    }
+    setIsLoggingOut(true);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/login');
+      router.refresh();
+    } catch (err) {
+      console.error('Erro ao sair:', err);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  const handleOpenPOSAction = () => {
+    if (onOpenPOS) onOpenPOS();
+    else if (onPOSOpen) onPOSOpen();
+    else setIsPOSOpen(true);
+  };
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-[#1e3256] bg-[#0a1120]/95 backdrop-blur-md px-4 py-2.5">
-      <div className="mx-auto flex max-w-7xl flex-col gap-2">
-        
-        {/* BANNER SUPERIOR DE ALERTA DE ESTOQUE CRÍTICO DE 1 UNIDADE (TEMPO REAL) */}
-        {criticalProducts.length > 0 && (
-          <div className="flex items-center justify-between rounded-xl bg-gradient-to-r from-red-950 via-amber-950 to-red-950 border border-red-700/60 px-3 py-1.5 text-xs font-bold text-red-200 shadow-md animate-pulse">
-            <div className="flex items-center gap-2 overflow-hidden truncate">
-              <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0" />
+    <>
+      {/* BANNER DE ALERTA EM TEMPO REAL PARA ESTOQUE CRÍTICO (1 UNIDADE) */}
+      {criticalProducts.length > 0 && (
+        <div className="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 px-4 py-2 text-white shadow-lg animate-pulse">
+          <div className="mx-auto flex max-w-7xl items-center justify-between text-xs font-bold md:text-sm">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-300 flex-shrink-0 animate-bounce" />
               <span>
-                🚨 <strong>ALERTA DE ESTOQUE CRÍTICO PARA A EQUIPE:</strong>{' '}
-                {criticalProducts.map(p => (
-                  <span key={p.id} className="mr-2 underline">
-                    {p.marca} {p.modelo} ({p.estoque === 0 ? 'ESGOTADA!' : 'RESTANDO APENAS 1 UNIDADE!'})
-                  </span>
-                ))}
+                <strong>ALERTA DE ESTOQUE CRÍTICO (1 UNIDADE RESTANTE):</strong>{' '}
+                {criticalProducts.map(p => `${p.marca} ${p.modelo} (${p.amperagem}Ah)`).join(', ')}
               </span>
             </div>
-            <span className="text-[10px] bg-red-900 px-2 py-0.5 rounded text-white font-black flex-shrink-0">
-              AVISO TEMPO REAL
+            <span className="hidden sm:inline-block rounded bg-black/30 px-2 py-0.5 text-[11px] uppercase">
+              Venda Urgente Balcão
             </span>
           </div>
-        )}
+        </div>
+      )}
 
-        <div className="flex items-center justify-between">
+      {/* HEADER DE NAVEGAÇÃO PRINCIPAL */}
+      <header className="sticky top-0 z-40 border-b border-[#1e3256] bg-[#0a1120]/95 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           
-          {/* LOGO JMIX BATERIAS 24H */}
+          {/* Logo e Nome da Loja */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative h-10 w-10 overflow-hidden rounded-xl border border-[#004b9a]/60 p-1 bg-[#0f2744] shadow-md group-hover:border-[#f99b1c] transition-all">
+            <div className="relative h-10 w-10 overflow-hidden rounded-xl border border-[#1e3256] bg-[#111d33] p-1 shadow-md group-hover:scale-105 transition-transform">
               <Image
                 src="/logo.png"
                 alt="JMix Baterias 24h"
@@ -105,88 +124,75 @@ export default function Navbar({ user, onOpenPOS, onLogout }: NavbarProps) {
                 priority
               />
             </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-black tracking-tight text-white group-hover:text-[#f99b1c] transition-colors">
-                  JMIX <span className="text-[#f99b1c]">BATERIAS</span>
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#e51b24] px-2 py-0.5 text-[10px] font-black uppercase text-white shadow-sm">
-                  <Zap className="h-3 w-3 fill-current" /> 24H
-                </span>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-lg font-black tracking-tight text-white">JMIX</span>
+                <span className="rounded bg-[#e51b24] px-1.5 py-0.2 text-[10px] font-black text-white">24H</span>
               </div>
-              <span className="text-[10px] font-medium text-slate-400">
-                Sistema Interno • Tempo Real
-              </span>
+              <p className="text-[10px] font-semibold text-slate-400">Sistema de Estoque & Balcão</p>
             </div>
           </Link>
 
-          {/* CONTROLES: BOTÃO INSTALAR PWA, PDV E PERFIL */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Ações Centrais & PWA */}
+          <div className="flex items-center gap-2 md:gap-3">
             
-            {/* BOTÃO INSTALAR PWA */}
+            {/* Botão de Instalar PWA no Celular */}
+            {installPrompt && (
+              <button
+                onClick={handleInstallPWA}
+                className="hidden sm:flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs font-bold text-amber-400 hover:bg-amber-500/20 transition-all"
+              >
+                <Download className="h-4 w-4" />
+                <span>INSTALAR NA TELA</span>
+              </button>
+            )}
+
+            {/* BOTÃO PRINCIPAL DE VENDER (ABRE O POS) */}
             <button
-              onClick={handleInstallPWA}
-              title="Instalar aplicativo na tela inicial do celular/computador"
-              className="flex items-center gap-1.5 rounded-xl border border-[#f99b1c]/40 bg-[#f99b1c]/10 px-3 py-1.5 text-xs font-bold text-[#f99b1c] hover:bg-[#f99b1c]/20 transition-all"
+              onClick={handleOpenPOSAction}
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#004b9a] via-[#0262c7] to-[#004b9a] px-4 py-2.5 text-xs font-extrabold text-white shadow-lg shadow-[#004b9a]/40 hover:brightness-110 active:scale-95 transition-all"
             >
-              <Download className="h-4 w-4" />
-              <span className="hidden md:inline">INSTALAR NA TELA</span>
-              <span className="md:hidden">APP</span>
+              <ShoppingCart className="h-4 w-4 text-amber-300" />
+              <span className="hidden xs:inline">+ REGISTRAR VENDA</span>
+              <span className="xs:hidden">VENDER</span>
             </button>
 
-            {user && (
-              <>
-                {/* Botão de Venda Rápida (PDV) */}
-                {onOpenPOS && (
-                  <button
-                    onClick={onOpenPOS}
-                    className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#e51b24] to-[#b81018] px-3 py-1.5 text-xs font-bold text-white shadow-md shadow-red-950/40 hover:brightness-110 active:scale-95 transition-all"
-                  >
-                    <ShoppingCart className="h-4 w-4" />
-                    <span className="hidden sm:inline">VENDER (PDV)</span>
-                    <span className="sm:hidden">PDV</span>
-                  </button>
-                )}
-
-                {/* CARD DE PERFIL */}
-                <div className={`hidden sm:flex items-center gap-2 rounded-xl border px-2.5 py-1 text-xs ${
-                  isAdmin 
-                    ? 'border-[#f99b1c]/40 bg-[#f99b1c]/10 text-white' 
-                    : 'border-[#1e3256] bg-[#111d33] text-slate-300'
-                }`}>
-                  <div className={`flex h-6 w-6 items-center justify-center rounded-full font-black text-xs ${
-                    isAdmin ? 'bg-[#f99b1c] text-slate-950' : 'bg-[#004b9a] text-white'
-                  }`}>
-                    {isAdmin ? <Crown className="h-3.5 w-3.5" /> : user.nome.charAt(0).toUpperCase()}
-                  </div>
-
-                  <div className="flex flex-col">
-                    <span className="font-bold text-white max-w-[110px] truncate leading-tight">
-                      {user.nome}
-                    </span>
-                    <span className={`text-[9px] font-bold ${
-                      isAdmin ? 'text-[#f99b1c]' : 'text-blue-400'
-                    }`}>
-                      {isAdmin ? 'DONO' : 'FUNCIONÁRIO'}
-                    </span>
-                  </div>
+            {/* Perfil do Usuário Logado */}
+            {currentUser && (
+              <div className="flex items-center gap-2 pl-2 border-l border-[#1e3256]">
+                <div className="hidden sm:flex flex-col items-end">
+                  <span className="text-xs font-bold text-white">{currentUser.nome}</span>
+                  <span className="text-[10px] text-slate-400">
+                    {currentUser.role === 'ADMIN' ? 'Dono (Admin)' : `Balcão (${currentUser.matricula})`}
+                  </span>
                 </div>
 
-                {/* SAIR */}
                 <button
-                  onClick={onLogout}
-                  title="Sair da conta"
-                  className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#1e3256] bg-[#111d33] text-slate-400 hover:border-red-600/60 hover:bg-red-950/40 hover:text-red-400 transition-all"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  title="Sair do Sistema"
+                  className="rounded-xl border border-[#1e3256] bg-[#111d33] p-2 text-slate-400 hover:border-red-800 hover:bg-red-950/50 hover:text-red-400 transition-all"
                 >
                   <LogOut className="h-4 w-4" />
                 </button>
-              </>
+              </div>
             )}
           </div>
 
         </div>
+      </header>
 
-      </div>
-    </header>
+      {/* Modal PDV de Venda Rápida */}
+      <POSModal
+        isOpen={isPOSOpen}
+        onClose={() => setIsPOSOpen(false)}
+        usuario={currentUser}
+        user={currentUser}
+        onSaleSuccess={() => {
+          setIsPOSOpen(false);
+          window.location.reload();
+        }}
+      />
+    </>
   );
 }
