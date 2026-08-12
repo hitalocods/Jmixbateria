@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, AlertCircle, ArrowRight, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -67,7 +68,7 @@ export default function LoginPage() {
               />
             </div>
             <h1 className="text-xl font-black text-white tracking-tight">JMix Baterias 24h</h1>
-            <p className="text-xs text-slate-400 mt-1">Acesso exclusivo para colaboradores e gerência</p>
+            <p className="text-xs text-slate-400 mt-1">Acesso ao sistema de estoque e balcão</p>
           </div>
 
           {/* Erro ao tentar logar */}
@@ -78,10 +79,10 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Formulário de Login */}
+          {/* Formulário de Login Único */}
           <form onSubmit={handleLogin} className="space-y-4 text-xs">
             <div>
-              <label className="block font-bold text-slate-300 mb-1.5">E-mail corporativo</label>
+              <label className="block font-bold text-slate-300 mb-1.5">E-mail de acesso</label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-500" />
                 <input
@@ -96,17 +97,31 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block font-bold text-slate-300 mb-1.5">Senha de acesso</label>
+              <label className="block font-bold text-slate-300 mb-1.5">Senha</label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-500" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={senha}
                   onChange={e => setSenha(e.target.value)}
-                  className="w-full rounded-xl border border-[#1e3256] bg-[#111d33] py-3 pl-10 pr-4 text-sm text-white placeholder-slate-500 focus:border-[#004b9a] focus:outline-none transition-colors"
+                  className="w-full rounded-xl border border-[#1e3256] bg-[#111d33] py-3 pl-10 pr-11 text-sm text-white placeholder-slate-500 focus:border-[#004b9a] focus:outline-none transition-colors"
                   required
                 />
+                
+                {/* Botão de Ver / Ocultar Senha */}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-3 text-slate-400 hover:text-white p-1"
+                  title={showPassword ? "Ocultar Senha" : "Ver Senha"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-amber-400" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -116,10 +131,10 @@ export default function LoginPage() {
               className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#004b9a] via-[#0262c7] to-[#004b9a] py-3.5 text-sm font-black text-white shadow-xl shadow-[#004b9a]/30 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {loading ? (
-                <span>ENTRANDO NO SISTEMA...</span>
+                <span>VERIFICANDO CREDENCIAIS...</span>
               ) : (
                 <>
-                  <span>ACESSAR O BALCÃO</span>
+                  <span>ENTRAR NO SISTEMA</span>
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
@@ -131,7 +146,7 @@ export default function LoginPage() {
         {/* Rodapé Seguro */}
         <div className="flex items-center justify-center gap-2 text-[11px] font-semibold text-slate-500">
           <ShieldCheck className="h-4 w-4 text-[#004b9a]" />
-          <span>Sistema Privado JMix Baterias 24h</span>
+          <span>Sistema Seguro JMix Baterias 24h</span>
         </div>
 
       </div>
