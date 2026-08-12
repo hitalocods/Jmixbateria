@@ -8,17 +8,17 @@
       "senhaHash": "$2a$10$fV3GjI4yC8r3i1j3K2/Z2.3K2L.g1tKxG3yZ7fA1uE9/S7.h0O.6",
       "role": "ADMIN",
       "ativo": true,
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "usr-func-1",
-      "nome": "Ytallo",
-      "email": "ytallo@gmail.com",
+      "nome": "Carlos Eduardo (Balcão)",
+      "email": "carlos@jmixbaterias.com.br",
       "matricula": "FUN001",
-      "senhaHash": "$2b$10$A70LCdNz.ANDU472rbD24eC.7z9PSSPCVXDUiayHsLp/8B43NGCIa",
+      "senhaHash": "$2a$10$fV3GjI4yC8r3i1j3K2/Z2.3K2L.g1tKxG3yZ7fA1uE9/S7.h0O.6",
       "role": "FUNCIONARIO",
       "ativo": true,
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "usr-func-2",
@@ -28,7 +28,17 @@
       "senhaHash": "$2a$10$fV3GjI4yC8r3i1j3K2/Z2.3K2L.g1tKxG3yZ7fA1uE9/S7.h0O.6",
       "role": "FUNCIONARIO",
       "ativo": true,
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
+    },
+    {
+      "nome": "Teste",
+      "email": "teste@gmail.com",
+      "matricula": "123456",
+      "senhaHash": "$2b$10$H3cH1rzsTsqnPiuiPD8ZCe41OprU7oeF3XqCiTqXhFvmFqY0SpXO6",
+      "role": "FUNCIONARIO",
+      "ativo": true,
+      "id": "usr-1786570194021",
+      "createdAt": "2026-08-12T21:29:54.021Z"
     }
   ],
   "products": [
@@ -50,9 +60,8 @@
       "precoVenda": 1099,
       "estoque": 6,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA ESTACIONARIA 105AH TIPO 12MN2000",
-      "createdAt": "2026-08-12T20:46:00.908Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-123048-1",
@@ -72,9 +81,8 @@
       "precoVenda": 1450,
       "estoque": 3,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA ESTACIONARIA 150AH TIPO 12MN2500",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-264144-2",
@@ -94,9 +102,8 @@
       "precoVenda": 1099,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ESTACIONARIA 12MN2000",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-115494-3",
@@ -116,9 +123,8 @@
       "precoVenda": 1998,
       "estoque": 2,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA ESTACIONARIA 105AH TIPO 12MN4100",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-133800-4",
@@ -138,9 +144,8 @@
       "precoVenda": 521,
       "estoque": 5,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ESTACIONARIA 12MN300",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63299-5",
@@ -160,9 +165,8 @@
       "precoVenda": 521,
       "estoque": 8,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA ESTACIONARIA 45AH TIPO 12MN700",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-135497-6",
@@ -182,9 +186,8 @@
       "precoVenda": 379,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA 12MVA-18",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-116453-7",
@@ -204,9 +207,8 @@
       "precoVenda": 219,
       "estoque": 10,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ESTACIONARIA 12MVA-7E",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63088-8",
@@ -226,9 +228,8 @@
       "precoVenda": 436,
       "estoque": 7,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA AMERICA 18 MESES 50Ah TIPO AMR50GD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63089-9",
@@ -248,9 +249,8 @@
       "precoVenda": 457,
       "estoque": 12,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA AMERICA 18 MESES 60Ah TIPO AMR60DD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63118-10",
@@ -270,9 +270,8 @@
       "precoVenda": 650,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA BOSCH 15 MESES 100Ah TIPO S5X100E",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-110619-11",
@@ -292,9 +291,8 @@
       "precoVenda": 749,
       "estoque": 5,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR ESTACIONARIA 60AH TIPO DF1000",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-128152-12",
@@ -314,9 +312,8 @@
       "precoVenda": 1290,
       "estoque": 3,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR ESTACIONARIA 105AH TIPO DF2000",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-81505-13",
@@ -336,9 +333,8 @@
       "precoVenda": 319,
       "estoque": 6,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ELETRAN 12 MESES 42AH TIPO 42PD HONDA",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-81503-14",
@@ -358,9 +354,8 @@
       "precoVenda": 329,
       "estoque": 8,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ELETRAN 12 MESES 47AH TIPO 47PD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-81502-15",
@@ -380,9 +375,8 @@
       "precoVenda": 349,
       "estoque": 9,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ELETRAN 12 MESES 50AH TIPO 50PDCA ALTA",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-81504-16",
@@ -402,9 +396,8 @@
       "precoVenda": 389,
       "estoque": 5,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ELETRAN 12 MESES 52AH TIPO 52PD HONDA",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-81499-17",
@@ -424,9 +417,8 @@
       "precoVenda": 589,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ELETRAN 18 MESES 60AH TIPO EFB",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-81500-18",
@@ -446,9 +438,8 @@
       "precoVenda": 699,
       "estoque": 3,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ELETRAN 18 MESES 72AH TIPO EFB",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-81501-19",
@@ -468,9 +459,8 @@
       "precoVenda": 499,
       "estoque": 5,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ELETRAN 12 MESES 75AH TIPO 75PD BAIXA",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-108163-20",
@@ -490,9 +480,8 @@
       "precoVenda": 589,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ELETRAN 12 MESES 90AH TIPO 90PD ALTA",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63085-21",
@@ -512,9 +501,8 @@
       "precoVenda": 1049,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR 24 MESES 100Ah TIPO H100LE",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63080-22",
@@ -534,9 +522,8 @@
       "precoVenda": 569,
       "estoque": 10,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR 24 MESES 50Ah TIPO HNP50GD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63077-23",
@@ -556,9 +543,8 @@
       "precoVenda": 819,
       "estoque": 3,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR EFB START STOP 24 MESES 50Ah TIPO HEFB50GD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63086-24",
@@ -578,9 +564,8 @@
       "precoVenda": 219,
       "estoque": 15,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR MOTO 5Ah TIPO HTZ6L",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-134476-25",
@@ -600,9 +585,8 @@
       "precoVenda": 1597,
       "estoque": 2,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR AGM START STOP 24 MESES TIPO HAGM60HD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63081-26",
@@ -622,9 +606,8 @@
       "precoVenda": 619,
       "estoque": 14,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR 24 MESES 60Ah TIPO HNP60DD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63082-27",
@@ -644,9 +627,8 @@
       "precoVenda": 619,
       "estoque": 11,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR 24 MESES 60Ah TIPO HNP60HD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63078-28",
@@ -666,9 +648,8 @@
       "precoVenda": 899,
       "estoque": 6,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR EFB START STOP 24 MESES 60Ah TIPO HEFB60HD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-127983-29",
@@ -688,9 +669,8 @@
       "precoVenda": 779,
       "estoque": 7,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR 24 MESES 65AH TIPO H65HD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63087-30",
@@ -710,9 +690,8 @@
       "precoVenda": 225,
       "estoque": 12,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR MOTO 6Ah TIPO HTZ7L",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63079-31",
@@ -732,9 +711,8 @@
       "precoVenda": 1025,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR EFB START STOP 24 MESES 72Ah TIPO HEFB72PD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63083-32",
@@ -754,9 +732,8 @@
       "precoVenda": 919,
       "estoque": 5,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR 24 MESES 75Ah TIPO H75PD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63084-33",
@@ -776,9 +753,8 @@
       "precoVenda": 999,
       "estoque": 3,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR 24 MESES 90Ah TIPO H90LD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-114870-34",
@@ -798,9 +774,8 @@
       "precoVenda": 1023,
       "estoque": 3,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA HELIAR 18 MESES 95AH TIPO H95MD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63126-35",
@@ -820,9 +795,8 @@
       "precoVenda": 659,
       "estoque": 6,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA KONDOR 12 MESES 100Ah TIPO F30AGE",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63127-36",
@@ -842,9 +816,8 @@
       "precoVenda": 899,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA KONDOR 12 MESES 150Ah TIPO F21SB",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63129-37",
@@ -864,9 +837,8 @@
       "precoVenda": 979,
       "estoque": 2,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA KONDOR 12 MESES 180Ah TIPO F25DB",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63119-38",
@@ -886,9 +858,8 @@
       "precoVenda": 335,
       "estoque": 9,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA KONDOR 12 MESES 46Ah TIPO F45D",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63120-39",
@@ -908,9 +879,8 @@
       "precoVenda": 374,
       "estoque": 11,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA KONDOR 12 MESES 50Ah TIPO F50AD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63122-40",
@@ -930,9 +900,8 @@
       "precoVenda": 389,
       "estoque": 18,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA KONDOR 12 MESES 60Ah TIPO F22AD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63130-41",
@@ -952,9 +921,8 @@
       "precoVenda": 596,
       "estoque": 5,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA KONDOR EFB START STOP 24 MESES 60Ah TIPO EFB22AD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63131-42",
@@ -974,9 +942,8 @@
       "precoVenda": 785,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA KONDOR EFB START STOP 24 MESES 72Ah TIPO EFB28AD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63123-43",
@@ -996,9 +963,8 @@
       "precoVenda": 539,
       "estoque": 7,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA KONDOR 12 MESES 75Ah TIPO F75AD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63124-44",
@@ -1018,9 +984,8 @@
       "precoVenda": 594,
       "estoque": 5,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA KONDOR 12 MESES 90Ah TIPO F26HD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63044-45",
@@ -1040,9 +1005,8 @@
       "precoVenda": 886,
       "estoque": 8,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 15 MESES 100Ah TIPO M100HE",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63045-46",
@@ -1062,9 +1026,8 @@
       "precoVenda": 897,
       "estoque": 6,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 15 MESES 100Ah TIPO M100QD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63046-47",
@@ -1084,9 +1047,8 @@
       "precoVenda": 1020,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 15 MESES 135Ah TIPO M135BD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63047-48",
@@ -1106,9 +1068,8 @@
       "precoVenda": 1093,
       "estoque": 5,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 15 MESES 150Ah TIPO M150BD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63048-49",
@@ -1128,9 +1089,8 @@
       "precoVenda": 1205,
       "estoque": 3,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 15 MESES 180Ah TIPO M180BD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63050-50",
@@ -1150,9 +1110,8 @@
       "precoVenda": 1590,
       "estoque": 2,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 15 MESES 220Ah TIPO M220PD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63029-51",
@@ -1172,9 +1131,8 @@
       "precoVenda": 450,
       "estoque": 10,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 18 MESES 40Ah TIPO M40FD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63030-52",
@@ -1194,9 +1152,8 @@
       "precoVenda": 470,
       "estoque": 8,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 18 MESES 40Ah TIPO M40SD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63031-53",
@@ -1216,9 +1173,8 @@
       "precoVenda": 509,
       "estoque": 9,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 18 MESES 48Ah TIPO M48FD",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63032-54",
@@ -1238,9 +1194,8 @@
       "precoVenda": 514,
       "estoque": 12,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 18 MESES 50Ah TIPO M50ED",
-      "createdAt": "2026-08-12T20:46:00.910Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63033-55",
@@ -1260,9 +1215,8 @@
       "precoVenda": 538,
       "estoque": 7,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 18 MESES 50Ah TIPO M50JD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63037-56",
@@ -1282,9 +1236,8 @@
       "precoVenda": 529,
       "estoque": 1,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 18 MESES 60Ah TIPO M60AD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63035-57",
@@ -1304,9 +1257,8 @@
       "precoVenda": 529,
       "estoque": 15,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 18 MESES 60Ah TIPO M60GD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63038-58",
@@ -1326,9 +1278,8 @@
       "precoVenda": 693,
       "estoque": 10,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 18 MESES 70Ah TIPO M70KD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63040-59",
@@ -1348,9 +1299,8 @@
       "precoVenda": 749,
       "estoque": 8,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 18 MESES 75Ah TIPO M75LD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63042-60",
@@ -1370,9 +1320,8 @@
       "precoVenda": 836,
       "estoque": 5,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 15 MESES 80Ah TIPO M80CD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63043-61",
@@ -1392,9 +1341,8 @@
       "precoVenda": 874,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA 15 MESES 90Ah TIPO M90TD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63060-62",
@@ -1414,9 +1362,8 @@
       "precoVenda": 2612,
       "estoque": 2,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA AGM START STOP 24 MESES TIPO MA105DD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63062-63",
@@ -1436,9 +1383,8 @@
       "precoVenda": 209,
       "estoque": 20,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA MOTO 5Ah TIPO MA5",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63063-64",
@@ -1458,9 +1404,8 @@
       "precoVenda": 223,
       "estoque": 18,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA MOTO 6Ah TIPO MA6",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63056-65",
@@ -1480,9 +1425,8 @@
       "precoVenda": 1399,
       "estoque": 3,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA AGM START STOP 24 MESES TIPO MA60AD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63058-66",
@@ -1502,9 +1446,8 @@
       "precoVenda": 2153,
       "estoque": 2,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA AGM START STOP 24 MESES TIPO MA80CD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63059-67",
@@ -1524,9 +1467,8 @@
       "precoVenda": 2263,
       "estoque": 2,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA AGM START STOP 24 MESES TIPO MA92QD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63052-68",
@@ -1546,9 +1488,8 @@
       "precoVenda": 753,
       "estoque": 6,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA EFB START STOP 24 MESES TIPO MF50ED",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63053-69",
@@ -1568,9 +1509,8 @@
       "precoVenda": 860,
       "estoque": 8,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA EFB START STOP 24 MESES TIPO MF60AD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63054-70",
@@ -1590,9 +1530,8 @@
       "precoVenda": 1014,
       "estoque": 4,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA EFB START STOP 24 MESES TIPO MF72LD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63055-71",
@@ -1612,9 +1551,8 @@
       "precoVenda": 1145,
       "estoque": 3,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA MOURA EFB START STOP 24 MESES TIPO MF80",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63114-72",
@@ -1634,9 +1572,8 @@
       "precoVenda": 339,
       "estoque": 15,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ONBAT 12 MESES 60Ah TIPO F 60DN",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63096-73",
@@ -1656,9 +1593,8 @@
       "precoVenda": 379,
       "estoque": 16,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA PIONEIRO 18 MESES 60Ah TIPO F60AD",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63106-74",
@@ -1678,9 +1614,8 @@
       "precoVenda": 563,
       "estoque": 5,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA PIONEIRO EFB START STOP 24 MESES 60Ah TIPO EFB60D",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63071-75",
@@ -1700,9 +1635,8 @@
       "precoVenda": 439,
       "estoque": 14,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ZETTA 12 MESES 60Ah TIPO Z60",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-63072-76",
@@ -1722,9 +1656,8 @@
       "precoVenda": 645,
       "estoque": 9,
       "estoqueMinimo": 2,
-      "imagemUrl": "/logo.png",
       "descricao": "BATERIA ZETTA 12 MESES 70Ah TIPO Z70D",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-semi-moura-60",
@@ -1744,9 +1677,8 @@
       "precoVenda": 220,
       "estoque": 5,
       "estoqueMinimo": 1,
-      "imagemUrl": "/logo.png",
       "descricao": "Bateria Moura 60Ah recondicionada testada em analisador digital com 3 meses de garantia.",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     },
     {
       "id": "prod-semi-heliar-50",
@@ -1766,9 +1698,8 @@
       "precoVenda": 190,
       "estoque": 3,
       "estoqueMinimo": 1,
-      "imagemUrl": "/logo.png",
       "descricao": "Bateria Heliar 50Ah seminova em excelente estado com garantia de balcão.",
-      "createdAt": "2026-08-12T20:46:00.911Z"
+      "createdAt": "2026-08-12T21:28:53.472Z"
     }
   ],
   "sales": [
@@ -1783,9 +1714,10 @@
       "subtotal": 529,
       "desconto": 20,
       "valorTrocaSucata": 50,
-      "total": 459,
-      "observacao": "Cliente entregou bateria velha na troca.",
-      "dataVenda": "2026-08-12T18:46:00.911Z",
+      "valorInstalacao": 30,
+      "total": 489,
+      "observacao": "Cliente entregou bateria velha na troca + instalação no local.",
+      "dataVenda": "2026-08-12T19:28:53.472Z",
       "itens": [
         {
           "id": "item-1",
@@ -1802,44 +1734,20 @@
   ],
   "auditLogs": [
     {
-      "id": "log-1786568756665",
+      "id": "log-1786570194023",
       "usuarioId": "usr-admin-1",
       "usuarioNome": "Gerente JMix",
-      "acao": "USUARIO_EDITADO",
-      "detalhes": "Dados do funcionário \"Ytallo\" (ytallo@gmail.com) foram atualizados.",
-      "dataHora": "2026-08-12T21:05:56.665Z"
-    },
-    {
-      "id": "log-1786568694075",
-      "usuarioId": "usr-admin-1",
-      "usuarioNome": "Gerente JMix",
-      "acao": "LOGIN_USUARIO",
-      "detalhes": "Usuário Gerente JMix (ADMIN) efetuou login no sistema.",
-      "dataHora": "2026-08-12T21:04:54.075Z"
-    },
-    {
-      "id": "log-1786567870588",
-      "usuarioId": "usr-func-1",
-      "usuarioNome": "Carlos Eduardo (Balcão)",
-      "acao": "LOGIN_USUARIO",
-      "detalhes": "Usuário Carlos Eduardo (Balcão) (FUNCIONARIO) efetuou login no sistema.",
-      "dataHora": "2026-08-12T20:51:10.588Z"
-    },
-    {
-      "id": "log-1786567790260",
-      "usuarioId": "usr-admin-1",
-      "usuarioNome": "Gerente JMix",
-      "acao": "LOGIN_USUARIO",
-      "detalhes": "Usuário Gerente JMix (ADMIN) efetuou login no sistema.",
-      "dataHora": "2026-08-12T20:49:50.260Z"
+      "acao": "USUARIO_CRIADO",
+      "detalhes": "Novo funcionário \"Teste\" (teste@gmail.com) cadastrado com perfil FUNCIONARIO.",
+      "dataHora": "2026-08-12T21:29:54.023Z"
     },
     {
       "id": "log-1",
       "usuarioId": "usr-admin-1",
       "usuarioNome": "Gerente JMix",
-      "acao": "CATALOGO_IMPORTADO",
-      "detalhes": "Catálogo de 70+ produtos importado da planilha oficial com preços de custo e venda real.",
-      "dataHora": "2026-08-12T20:46:00.912Z"
+      "acao": "CATALOGO_NEON_IMPORTADO",
+      "detalhes": "Catálogo de 70+ produtos importado da planilha oficial diretamente no Neon Postgres.",
+      "dataHora": "2026-08-12T21:28:53.472Z"
     }
   ]
 }

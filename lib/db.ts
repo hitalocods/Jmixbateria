@@ -318,6 +318,17 @@ function loadLocalData() {
     if (fs.existsSync(DB_FILE)) {
       const raw = fs.readFileSync(DB_FILE, 'utf-8');
       const data = JSON.parse(raw);
+
+      // Garantir que a conta admin@jmixbaterias.com.br sempre seja ADMIN
+      if (data.users && Array.isArray(data.users)) {
+        const adminIdx = data.users.findIndex((u: any) => u.email.toLowerCase() === 'admin@jmixbaterias.com.br');
+        if (adminIdx > -1) {
+          data.users[adminIdx].role = 'ADMIN';
+        } else {
+          data.users.unshift(defaultUsers[0]);
+        }
+      }
+
       return {
         users: data.users || defaultUsers,
         products: data.products || allProducts,
