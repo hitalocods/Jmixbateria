@@ -12,7 +12,9 @@ import {
   Plus, 
   Filter, 
   Edit, 
-  Trash2
+  Trash2,
+  CheckCircle,
+  AlertTriangle
 } from 'lucide-react';
 
 export default function EstoquePage() {
@@ -147,91 +149,156 @@ export default function EstoquePage() {
 
           </div>
 
-          {/* Tabela de Produtos */}
+          {/* Produtos (Visão Desktop em Tabela e Visão Mobile em Cards) */}
           <div className="rounded-2xl border border-[#1e3256] bg-[#0a1120] overflow-hidden shadow-xl">
             {loading ? (
               <div className="p-12 text-center text-slate-400">Carregando estoque...</div>
             ) : filteredProducts.length === 0 ? (
               <div className="p-12 text-center text-slate-400">Nenhuma bateria encontrada para o filtro selecionado.</div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-[#111d33] uppercase text-slate-300 font-bold border-b border-[#1e3256]">
-                    <tr>
-                      <th className="px-5 py-4">Bateria / Marca</th>
-                      <th className="px-5 py-4">SKU / Modelo</th>
-                      <th className="px-5 py-4">Amperagem</th>
-                      <th className="px-5 py-4">Aplicação</th>
-                      <th className="px-5 py-4">Garantia</th>
-                      {isAdmin && <th className="px-5 py-4">Preço Custo</th>}
-                      <th className="px-5 py-4">Preço Venda</th>
-                      <th className="px-5 py-4">Estoque</th>
-                      {isAdmin && <th className="px-5 py-4 text-right">Ações</th>}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#1e3256]/60">
-                    {filteredProducts.map(prod => (
-                      <tr key={prod.id} className="hover:bg-[#111d33]/50 transition-colors">
-                        <td className="px-5 py-3.5">
-                          <p className="font-bold text-white text-sm">{prod.marca}</p>
-                          <p className="text-[11px] text-slate-400">{prod.descricao}</p>
-                        </td>
-                        <td className="px-5 py-3.5 font-mono font-bold text-slate-300">
-                          {prod.codigoSKU ? `${prod.codigoSKU} - ` : ''}{prod.modelo}
-                        </td>
-                        <td className="px-5 py-3.5 font-bold text-blue-400">
-                          {prod.amperagem} Ah ({prod.voltagem})
-                        </td>
-                        <td className="px-5 py-3.5 uppercase font-semibold text-slate-300">
-                          {prod.aplicacao}
-                        </td>
-                        <td className="px-5 py-3.5 text-slate-300">
-                          {prod.garantiaMeses} meses
-                        </td>
-                        {isAdmin && (
-                          <td className="px-5 py-3.5 text-slate-400">
-                            R$ {(prod.precoCusto || 0).toFixed(2)}
-                          </td>
-                        )}
-                        <td className="px-5 py-3.5 font-black text-emerald-400 text-sm">
-                          R$ {prod.precoVenda.toFixed(2)}
-                        </td>
-                        <td className="px-5 py-3.5">
-                          <span className={`inline-block rounded-lg px-2.5 py-1 font-extrabold text-xs ${
-                            prod.estoque === 0
-                              ? 'bg-rose-950 text-rose-300 border border-rose-800'
-                              : prod.estoque === 1
-                              ? 'bg-amber-950 text-amber-300 border border-amber-800 animate-pulse'
-                              : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                          }`}>
-                            {prod.estoque} un
-                          </span>
-                        </td>
-                        {isAdmin && (
-                          <td className="px-5 py-3.5 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <button
-                                onClick={() => {
-                                  setProductToEdit(prod);
-                                  setIsProductModalOpen(true);
-                                }}
-                                className="rounded-lg border border-[#1e3256] bg-[#111d33] p-1.5 text-slate-300 hover:text-white"
-                              >
-                                <Edit className="h-3.5 w-3.5 text-blue-400" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteProduct(prod.id, prod.modelo)}
-                                className="rounded-lg border border-red-900/40 bg-red-950/40 p-1.5 text-red-300 hover:text-white"
-                              >
-                                <Trash2 className="h-3.5 w-3.5 text-red-400" />
-                              </button>
-                            </div>
-                          </td>
-                        )}
+              <div>
+                
+                {/* VISUALIZAÇÃO DESKTOP (Tabela) */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#111d33] uppercase text-slate-300 font-bold border-b border-[#1e3256]">
+                      <tr>
+                        <th className="px-5 py-4">Bateria / Marca</th>
+                        <th className="px-5 py-4">SKU / Modelo</th>
+                        <th className="px-5 py-4">Amperagem</th>
+                        <th className="px-5 py-4">Aplicação</th>
+                        <th className="px-5 py-4">Garantia</th>
+                        {isAdmin && <th className="px-5 py-4">Preço Custo</th>}
+                        <th className="px-5 py-4">Preço Venda</th>
+                        <th className="px-5 py-4">Estoque</th>
+                        {isAdmin && <th className="px-5 py-4 text-right">Ações</th>}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-[#1e3256]/60">
+                      {filteredProducts.map(prod => (
+                        <tr key={prod.id} className="hover:bg-[#111d33]/50 transition-colors">
+                          <td className="px-5 py-3.5">
+                            <p className="font-bold text-white text-sm">{prod.marca}</p>
+                            <p className="text-[11px] text-slate-400">{prod.descricao}</p>
+                          </td>
+                          <td className="px-5 py-3.5 font-mono font-bold text-slate-300">
+                            {prod.codigoSKU ? `${prod.codigoSKU} - ` : ''}{prod.modelo}
+                          </td>
+                          <td className="px-5 py-3.5 font-bold text-blue-400">
+                            {prod.amperagem} Ah ({prod.voltagem})
+                          </td>
+                          <td className="px-5 py-3.5 uppercase font-semibold text-slate-300">
+                            {prod.aplicacao}
+                          </td>
+                          <td className="px-5 py-3.5 text-slate-300">
+                            {prod.garantiaMeses} meses
+                          </td>
+                          {isAdmin && (
+                            <td className="px-5 py-3.5 text-slate-400">
+                              R$ {(prod.precoCusto || 0).toFixed(2)}
+                            </td>
+                          )}
+                          <td className="px-5 py-3.5 font-black text-emerald-400 text-sm">
+                            R$ {prod.precoVenda.toFixed(2)}
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <span className={`inline-block rounded-lg px-2.5 py-1 font-extrabold text-xs ${
+                              prod.estoque === 0
+                                ? 'bg-rose-950 text-rose-300 border border-rose-800'
+                                : prod.estoque === 1
+                                ? 'bg-amber-950 text-amber-300 border border-amber-800 animate-pulse'
+                                : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                            }`}>
+                              {prod.estoque} un
+                            </span>
+                          </td>
+                          {isAdmin && (
+                            <td className="px-5 py-3.5 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => {
+                                    setProductToEdit(prod);
+                                    setIsProductModalOpen(true);
+                                  }}
+                                  className="rounded-lg border border-[#1e3256] bg-[#111d33] p-1.5 text-slate-300 hover:text-white"
+                                >
+                                  <Edit className="h-3.5 w-3.5 text-blue-400" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteProduct(prod.id, prod.modelo)}
+                                  className="rounded-lg border border-red-900/40 bg-red-950/40 p-1.5 text-red-300 hover:text-white"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5 text-red-400" />
+                                </button>
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* VISUALIZAÇÃO MOBILE (Cards de Bateria Perfeitamente Visíveis no Celular) */}
+                <div className="block md:hidden divide-y divide-[#1e3256]">
+                  {filteredProducts.map(prod => (
+                    <div key={prod.id} className="p-4 space-y-2 text-xs bg-[#0a1120]">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-black text-white text-base">{prod.marca} {prod.modelo}</span>
+                            <span className="rounded bg-[#004b9a] px-2 py-0.5 text-[10px] font-black text-white">
+                              {prod.amperagem}Ah
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-400 mt-0.5">{prod.descricao}</p>
+                          {prod.codigoSKU && (
+                            <p className="text-[10px] text-slate-500 font-mono mt-0.5">SKU: {prod.codigoSKU}</p>
+                          )}
+                        </div>
+
+                        <span className={`rounded-lg px-2.5 py-1 font-extrabold text-xs flex-shrink-0 ${
+                          prod.estoque === 0
+                            ? 'bg-rose-950 text-rose-300 border border-rose-800'
+                            : prod.estoque === 1
+                            ? 'bg-amber-950 text-amber-300 border border-amber-800 animate-pulse'
+                            : 'bg-emerald-950 text-emerald-300 border border-emerald-800'
+                        }`}>
+                          {prod.estoque} un
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 border-t border-[#1e3256]/60">
+                        <div>
+                          <span className="text-[10px] text-slate-400 block">Preço de Venda</span>
+                          <span className="text-base font-black text-emerald-400">R$ {prod.precoVenda.toFixed(2)}</span>
+                        </div>
+
+                        {isAdmin && (
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => {
+                                setProductToEdit(prod);
+                                setIsProductModalOpen(true);
+                              }}
+                              className="rounded-lg border border-[#1e3256] bg-[#111d33] px-3 py-1.5 text-xs font-bold text-slate-200"
+                            >
+                              <Edit className="h-3.5 w-3.5 text-blue-400 inline mr-1" />
+                              <span>Editar</span>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProduct(prod.id, prod.modelo)}
+                              className="rounded-lg border border-red-900/40 bg-red-950/40 p-1.5 text-red-300"
+                            >
+                              <Trash2 className="h-3.5 w-3.5 text-red-400" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
               </div>
             )}
           </div>
