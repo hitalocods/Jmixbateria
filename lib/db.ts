@@ -319,7 +319,7 @@ let isNeonInitialized = false;
 async function initNeonTables() {
   if (isNeonInitialized) return;
   try {
-    // Criar tabela se não existir
+    // Criar tabela de produtos
     await sql`
       CREATE TABLE IF NOT EXISTS products (
         id VARCHAR(255) PRIMARY KEY,
@@ -343,6 +343,32 @@ async function initNeonTables() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `;
+
+    // Criar tabela de usuários
+    await sql`
+      CREATE TABLE IF NOT EXISTS users (
+        id VARCHAR(255) PRIMARY KEY,
+        nome VARCHAR(255),
+        email VARCHAR(255) UNIQUE,
+        matricula VARCHAR(255),
+        senha_hash VARCHAR(255),
+        role VARCHAR(50),
+        ativo BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Seeder de usuários padrão no Neon
+    const userCount = await sql`SELECT COUNT(*) as count FROM users`;
+    if (userCount && Number(userCount[0].count) === 0) {
+      for (const u of defaultUsers) {
+        await sql`
+          INSERT INTO users (id, nome, email, matricula, senha_hash, role, ativo, created_at)
+          VALUES (${u.id}, ${u.nome}, ${u.email}, ${u.matricula}, ${u.senhaHash}, ${u.role}, ${u.ativo}, ${u.createdAt})
+          ON CONFLICT (id) DO NOTHING;
+        `;
+      }
+    }
 
     const countRes = await sql`SELECT COUNT(*) as count FROM products`;
     if (countRes && Number(countRes[0].count) === 0) {
@@ -379,7 +405,7 @@ function loadLocalData() {
       }
 
       return {
-        users: data.users || defaultUsers,
+        users: data.users && data.users.length > 0 ? data.users : defaultUsers,
         products: data.products && data.products.length > 0 ? data.products : allProducts,
         sales: data.sales || defaultSales,
         auditLogs: data.auditLogs || defaultAuditLogs
@@ -545,7 +571,6 @@ export const db = {
 
       data.products[prodIdx].estoque -= item.quantidade;
       
-      // Atualizar também no Neon Postgres
       try {
         await sql`UPDATE products SET estoque = ${data.products[prodIdx].estoque} WHERE id = ${product.id}`;
       } catch (err) {}
@@ -606,51 +631,93 @@ export const db = {
     return newSale;
   },
 
-  // USUÁRIOS
+  // USUÁRIOS (GERENCIAMENTO COMPLETO NEON DB E LOCAL)
   async getUsers(): Promise<User[]> {
+    try {
+      await initNeonTables();
+      const res = await sql`SELECT * FROM users ORDER BY created_at ASC`;
+      if (res && res.length > 0) {
+        return res.map((r: any) => ({
+          id: r.id,
+          nome: r.nome,
+          email: r.email,
+          matricula: r.matricula,
+          senhaHash: r.senha_hash,
+          role: r.role as Role,
+          ativo: r.ativo,
+          createdAt: r.created_at
+        }));
+      }
+    } catch (err) {}
+
     const data = loadLocalData();
     return data.users;
   },
 
   async getUserByEmail(email: string): Promise<User | null> {
-    const data = loadLocalData();
-    return data.users.find((u: User) => u.email.toLowerCase() === email.toLowerCase()) || null;
+    const users = await this.getUsers();
+    return users.find((u: User) => u.email.toLowerCase() === email.toLowerCase()) || null;
   },
 
   async createUser(user: Omit<User, 'id' | 'createdAt'>): Promise<User> {
-    const data = loadLocalData();
     const newUser: User = {
       ...user,
       id: 'usr-' + Date.now(),
       createdAt: new Date().toISOString()
     };
+
+    try {
+      await initNeonTables();
+      await sql`
+        INSERT INTO users (id, nome, email, matricula, senha_hash, role, ativo, created_at)
+        VALUES (${newUser.id}, ${newUser.nome}, ${newUser.email}, ${newUser.matricula}, ${newUser.senhaHash}, ${newUser.role}, ${newUser.ativo}, ${newUser.createdAt})
+        ON CONFLICT (id) DO UPDATE SET
+          nome = EXCLUDED.nome,
+          email = EXCLUDED.email,
+          matricula = EXCLUDED.matricula,
+          senha_hash = EXCLUDED.senha_hash,
+          role = EXCLUDED.role,
+          ativo = EXCLUDED.ativo;
+      `;
+    } catch (err) {}
+
+    const data = loadLocalData();
     data.users.push(newUser);
     saveLocalData(data);
     return newUser;
   },
 
   async updateUser(id: string, user: Partial<User>): Promise<User | null> {
+    try {
+      await initNeonTables();
+      if (user.nome) await sql`UPDATE users SET nome = ${user.nome} WHERE id = ${id}`;
+      if (user.email) await sql`UPDATE users SET email = ${user.email} WHERE id = ${id}`;
+      if (user.matricula) await sql`UPDATE users SET matricula = ${user.matricula} WHERE id = ${id}`;
+      if (user.senhaHash) await sql`UPDATE users SET senha_hash = ${user.senhaHash} WHERE id = ${id}`;
+      if (user.role) await sql`UPDATE users SET role = ${user.role} WHERE id = ${id}`;
+      if (user.ativo !== undefined) await sql`UPDATE users SET ativo = ${user.ativo} WHERE id = ${id}`;
+    } catch (err) {}
+
     const data = loadLocalData();
     const idx = data.users.findIndex((u: User) => u.id === id);
-    if (idx === -1) return null;
-
-    data.users[idx] = {
-      ...data.users[idx],
-      ...user
-    };
-    saveLocalData(data);
-    return data.users[idx];
+    if (idx !== -1) {
+      data.users[idx] = { ...data.users[idx], ...user };
+      saveLocalData(data);
+      return data.users[idx];
+    }
+    return null;
   },
 
   async deleteUser(id: string): Promise<boolean> {
+    try {
+      await initNeonTables();
+      await sql`DELETE FROM users WHERE id = ${id}`;
+    } catch (err) {}
+
     const data = loadLocalData();
-    const initialLen = data.users.length;
-    data.users = data.users.filter((u: User) => u.id !== id);
-    if (data.users.length < initialLen) {
-      saveLocalData(data);
-      return true;
-    }
-    return false;
+    data.users = data.users.filter((u: User) => u.id !== id && u.id.toString() !== id.toString());
+    saveLocalData(data);
+    return true;
   },
 
   // LOGS

@@ -120,8 +120,8 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
     }
 
-    const { searchParams } = new URL(req.url);
-    let id = searchParams.get('id');
+    const url = new URL(req.url);
+    let id = url.searchParams.get('id');
 
     if (!id) {
       try {
@@ -131,17 +131,14 @@ export async function DELETE(req: Request) {
     }
 
     if (!id) {
-      return NextResponse.json({ error: 'ID do funcionário é obrigatório.' }, { status: 400 });
+      return NextResponse.json({ error: 'ID do funcionário é obrigatório para exclusão.' }, { status: 400 });
     }
 
     if (id === session.id) {
-      return NextResponse.json({ error: 'Você não pode excluir a sua própria conta ativa.' }, { status: 400 });
+      return NextResponse.json({ error: 'Você não pode excluir a sua própria conta atualmente conectada.' }, { status: 400 });
     }
 
     const success = await db.deleteUser(id);
-    if (!success) {
-      return NextResponse.json({ error: 'Funcionário não encontrado para exclusão.' }, { status: 404 });
-    }
 
     await db.addAuditLog(
       session.id,
