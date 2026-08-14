@@ -1734,6 +1734,14 @@
   ],
   "auditLogs": [
     {
+      "id": "log-1786669577304",
+      "usuarioId": "usr-admin-1",
+      "usuarioNome": "Gerente JMix",
+      "acao": "LOGIN_SUCESSO",
+      "detalhes": "Login realizado com sucesso pelo perfil ADMIN.",
+      "dataHora": "2026-08-14T01:06:17.304Z"
+    },
+    {
       "id": "log-1786570194023",
       "usuarioId": "usr-admin-1",
       "usuarioNome": "Gerente JMix",

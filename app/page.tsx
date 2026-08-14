@@ -117,7 +117,47 @@ export default function DashboardPage() {
   // Métricas Financeiras
   const totalFaturamento = salesFiltradas.reduce((acc, s) => acc + (s.total || 0), 0);
   const totalInstalacao = salesFiltradas.reduce((acc, s) => acc + (s.valorInstalacao || 0), 0);
+  const totalComissoes = salesFiltradas.reduce((acc, s) => acc + (s.valorComissao || 0), 0);
   
+  // Agrupamento de Comissões por Funcionário para o Painel do Dono
+  const comissoesPorFuncionarioMap = new Map<string, {
+    nome: string;
+    totalVendas: number;
+    totalComissao: number;
+    motosCount: number;
+    carrosCount: number;
+    caminhoesCount: number;
+    outrosCount: number;
+  }>();
+
+  salesFiltradas.forEach(s => {
+    const nome = s.usuarioNome || 'Balcão';
+    if (!comissoesPorFuncionarioMap.has(nome)) {
+      comissoesPorFuncionarioMap.set(nome, {
+        nome,
+        totalVendas: 0,
+        totalComissao: 0,
+        motosCount: 0,
+        carrosCount: 0,
+        caminhoesCount: 0,
+        outrosCount: 0
+      });
+    }
+    const info = comissoesPorFuncionarioMap.get(nome)!;
+    info.totalVendas += 1;
+    const val = s.valorComissao || 0;
+    if (val > 0) {
+      info.totalComissao += val;
+      const tipo = (s.tipoComissao || '').toLowerCase();
+      if (tipo.includes('moto')) info.motosCount += 1;
+      else if (tipo.includes('carro')) info.carrosCount += 1;
+      else if (tipo.includes('caminhão') || tipo.includes('caminhao')) info.caminhoesCount += 1;
+      else info.outrosCount += 1;
+    }
+  });
+
+  const resumoComissoes = Array.from(comissoesPorFuncionarioMap.values());
+
   // Lucro líquido estimado (Apenas ADMIN)
   let lucroTotal = 0;
   salesFiltradas.forEach(sale => {
@@ -140,7 +180,7 @@ export default function DashboardPage() {
       return;
     }
 
-    const headers = ['Codigo Venda', 'Data Hora', 'Vendedor', 'Cliente', 'Forma Pagamento', 'Subtotal', 'Taxa Instalacao', 'Desconto', 'Total Pago', 'Lucro Estimado'];
+    const headers = ['Codigo Venda', 'Data Hora', 'Vendedor', 'Cliente', 'Forma Pagamento', 'Subtotal', 'Comissao Funcionario', 'Tipo Comissao', 'Desconto', 'Total Pago', 'Lucro Estimado'];
     
     const rows = salesFiltradas.map(s => {
       let custoVenda = 0;
@@ -159,7 +199,8 @@ export default function DashboardPage() {
         `"${s.clienteNome || 'Balcao'}"`,
         s.formaPagamento,
         (s.subtotal || 0).toFixed(2),
-        (s.valorInstalacao || 0).toFixed(2),
+        (s.valorComissao || 0).toFixed(2),
+        `"${s.tipoComissao || 'Nenhuma'}"`,
         (s.desconto || 0).toFixed(2),
         (s.total || 0).toFixed(2),
         lucro.toFixed(2)
@@ -313,27 +354,18 @@ export default function DashboardPage() {
               )}
             </div>
 
-            {/* Card 4: Taxas de Instalação */}
+            {/* Card 4: Comissões a Pagar aos Funcionários */}
             <div className="rounded-2xl border border-[#1e3256] bg-[#0a1120] p-5 shadow-lg">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Mão de Obra Instalações</span>
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/20 text-purple-400">
-                  <Wrench className="h-5 w-5" />
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Comissões a Pagar</span>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/20 text-purple-400 font-bold">
+                  💰
                 </div>
               </div>
-              {isAdmin ? (
-                <>
-                  <p className="text-2xl md:text-3xl font-black text-purple-400 mt-3">R$ {totalInstalacao.toFixed(2)}</p>
-                  <p className="text-[11px] text-slate-400 mt-1">Instalações em veículos</p>
-                </>
-              ) : (
-                <>
-                  <p className="text-2xl font-black text-purple-400 mt-3">
-                    {salesFiltradas.filter(s => (s.valorInstalacao || 0) > 0).length} <span className="text-xs font-normal text-slate-400">serviços</span>
-                  </p>
-                  <p className="text-[11px] text-slate-400 mt-1">Instalações efetuadas</p>
-                </>
-              )}
+              <p className="text-2xl md:text-3xl font-black text-purple-400 mt-3">R$ {totalComissoes.toFixed(2)}</p>
+              <p className="text-[11px] text-slate-400 mt-1">
+                {salesFiltradas.filter(s => (s.valorComissao || 0) > 0).length} comissões no período
+              </p>
             </div>
 
           </div>
@@ -372,6 +404,68 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
+
+          {/* PAINEL DE COMISSÕES DOS FUNCIONÁRIOS (ACERTO DO DONO) */}
+          <div className="rounded-2xl border border-purple-900/60 bg-purple-950/20 p-6 shadow-xl space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-purple-900/40 pb-3 gap-2">
+              <div className="flex items-center gap-2 text-purple-300">
+                <span className="text-xl">💰</span>
+                <div>
+                  <h2 className="text-lg font-black text-white">Relatório de Comissões dos Funcionários</h2>
+                  <p className="text-xs text-slate-400">Acerto do dono com colaboradores (Moto R$ 30, Carro R$ 35, Caminhão R$ 45)</p>
+                </div>
+              </div>
+              <span className="text-xs font-bold text-purple-300 bg-purple-950/80 border border-purple-800 px-3 py-1 rounded-xl">
+                Total a Pagar: R$ {totalComissoes.toFixed(2)}
+              </span>
+            </div>
+
+            {resumoComissoes.length === 0 ? (
+              <p className="text-xs text-slate-400 py-4 text-center">Nenhuma venda registrada com comissão neste período.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {resumoComissoes.map(f => (
+                  <div key={f.nome} className="rounded-xl border border-purple-900/50 bg-[#0a1120] p-4 space-y-2 shadow-md">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-white text-sm">{f.nome}</span>
+                      <span className="rounded bg-purple-900/60 px-2.5 py-1 text-xs font-black text-purple-300 border border-purple-700">
+                        R$ {f.totalComissao.toFixed(2)}
+                      </span>
+                    </div>
+
+                    <div className="text-xs text-slate-400 space-y-1.5 pt-2 border-t border-[#1e3256]">
+                      <p>Vendas Realizadas: <strong className="text-white">{f.totalVendas}</strong></p>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {f.motosCount > 0 && (
+                          <span className="bg-[#111d33] px-2 py-0.5 rounded text-[10px] font-bold text-purple-300 border border-purple-900">
+                            🛵 {f.motosCount}x Moto (R$ {f.motosCount * 30})
+                          </span>
+                        )}
+                        {f.carrosCount > 0 && (
+                          <span className="bg-[#111d33] px-2 py-0.5 rounded text-[10px] font-bold text-purple-300 border border-purple-900">
+                            🚗 {f.carrosCount}x Carro (R$ {f.carrosCount * 35})
+                          </span>
+                        )}
+                        {f.caminhoesCount > 0 && (
+                          <span className="bg-[#111d33] px-2 py-0.5 rounded text-[10px] font-bold text-purple-300 border border-purple-900">
+                            🚛 {f.caminhoesCount}x Caminhão (R$ {f.caminhoesCount * 45})
+                          </span>
+                        )}
+                        {f.outrosCount > 0 && (
+                          <span className="bg-[#111d33] px-2 py-0.5 rounded text-[10px] font-bold text-purple-300 border border-purple-900">
+                            🏷️ {f.outrosCount}x Outras
+                          </span>
+                        )}
+                        {f.motosCount === 0 && f.carrosCount === 0 && f.caminhoesCount === 0 && f.outrosCount === 0 && (
+                          <span className="text-[10px] text-slate-500 italic">Sem comissões acumuladas</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* CONTAGEM DIRETA DE ESTOQUE POR MARCA */}
           <div className="rounded-2xl border border-[#1e3256] bg-[#0a1120] p-6 shadow-xl">
@@ -422,7 +516,7 @@ export default function DashboardPage() {
                       <th className="px-4 py-3">Vendedor</th>
                       <th className="px-4 py-3">Cliente</th>
                       <th className="px-4 py-3">Pagamento</th>
-                      <th className="px-4 py-3">Instalação</th>
+                      <th className="px-4 py-3">Comissão Func.</th>
                       <th className="px-4 py-3 text-right">Total Pago</th>
                       {isAdmin && <th className="px-4 py-3 text-right">Lucro Estimado</th>}
                     </tr>
@@ -452,7 +546,13 @@ export default function DashboardPage() {
                             </span>
                           </td>
                           <td className="px-4 py-3 text-purple-400 font-semibold">
-                            {(venda.valorInstalacao || 0) > 0 ? `R$ ${venda.valorInstalacao.toFixed(2)}` : '-'}
+                            {(venda.valorComissao || 0) > 0 ? (
+                              <span className="rounded bg-purple-950 px-2 py-0.5 text-[10px] font-bold text-purple-300 border border-purple-800">
+                                R$ {venda.valorComissao?.toFixed(2)} ({venda.tipoComissao || 'Outro'})
+                              </span>
+                            ) : (
+                              '-'
+                            )}
                           </td>
                           <td className="px-4 py-3 text-right font-black text-emerald-400 text-sm">
                             R$ {(venda.total || 0).toFixed(2)}

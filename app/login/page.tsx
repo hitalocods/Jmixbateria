@@ -63,6 +63,7 @@ export default function LoginPage() {
                 src="/logo.png"
                 alt="JMix Baterias 24h"
                 fill
+                sizes="176px"
                 className="object-contain"
                 priority
               />

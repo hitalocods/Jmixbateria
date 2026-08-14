@@ -188,8 +188,13 @@ export default function VendasPage() {
                         <span className="rounded bg-[#0a1120] px-2 py-0.5 text-[10px] font-bold text-emerald-400 border border-[#1e3256]">
                           {sale.formaPagamento}
                         </span>
-                        {(sale.valorInstalacao || 0) > 0 && (
+                        {(sale.valorComissao || 0) > 0 && (
                           <span className="rounded bg-purple-950 px-2 py-0.5 text-[10px] font-bold text-purple-300 border border-purple-800 flex items-center gap-1">
+                            💰 Comissão ({sale.tipoComissao || 'Outro'}: R$ {sale.valorComissao?.toFixed(2)})
+                          </span>
+                        )}
+                        {(sale.valorInstalacao || 0) > 0 && (
+                          <span className="rounded bg-blue-950 px-2 py-0.5 text-[10px] font-bold text-blue-300 border border-blue-800 flex items-center gap-1">
                             <Wrench className="h-3 w-3" /> + Instalação (R$ {sale.valorInstalacao.toFixed(2)})
                           </span>
                         )}
@@ -258,6 +263,12 @@ export default function VendasPage() {
               <p><strong>Cliente:</strong> {selectedSale.clienteNome} {selectedSale.clienteContato && `(${selectedSale.clienteContato})`}</p>
               <p><strong>Forma de Pagamento:</strong> {selectedSale.formaPagamento}</p>
               <p><strong>Data/Hora:</strong> {new Date(selectedSale.dataVenda).toLocaleString('pt-BR')}</p>
+              {(selectedSale.valorComissao || 0) > 0 && (
+                <p className="text-purple-300 font-bold bg-purple-950/60 p-2 rounded border border-purple-800">
+                  💰 Comissão do Funcionário: R$ {selectedSale.valorComissao?.toFixed(2)} ({selectedSale.tipoComissao || 'Outro'})
+                  <span className="block text-[10px] text-slate-400 font-normal mt-0.5">* Apenas informativa (não afeta o total cobrado do cliente)</span>
+                </p>
+              )}
               
               <div className="border-t border-[#1e3256] pt-2">
                 <strong className="block mb-1">Itens Vendidos:</strong>
@@ -272,7 +283,7 @@ export default function VendasPage() {
               <div className="pt-2 text-right space-y-1">
                 <p>Subtotal Baterias: R$ {selectedSale.subtotal.toFixed(2)}</p>
                 {(selectedSale.valorInstalacao || 0) > 0 && (
-                  <p className="text-purple-400">+ Taxa de Instalação: R$ {selectedSale.valorInstalacao.toFixed(2)}</p>
+                  <p className="text-blue-400">+ Taxa de Instalação: R$ {selectedSale.valorInstalacao.toFixed(2)}</p>
                 )}
                 {selectedSale.valorTrocaSucata > 0 && (
                   <p className="text-amber-400">Abatimento Troca Bateria: -R$ {selectedSale.valorTrocaSucata.toFixed(2)}</p>

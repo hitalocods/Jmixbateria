@@ -33,6 +33,8 @@ export async function POST(req: Request) {
       desconto,
       valorTrocaSucata,
       valorInstalacao,
+      valorComissao,
+      tipoComissao,
       observacao,
       itens
     } = body;
@@ -50,6 +52,8 @@ export async function POST(req: Request) {
       desconto: Number(desconto) || 0,
       valorTrocaSucata: Number(valorTrocaSucata) || 0,
       valorInstalacao: Number(valorInstalacao) || 0,
+      valorComissao: Number(valorComissao) || 0,
+      tipoComissao: tipoComissao ? String(tipoComissao) : undefined,
       observacao,
       itens
     });

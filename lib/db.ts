@@ -68,6 +68,8 @@ export interface Sale {
   desconto: number;
   valorTrocaSucata: number;
   valorInstalacao: number;
+  valorComissao?: number;
+  tipoComissao?: string;
   total: number;
   observacao?: string;
   dataVenda: string;
@@ -550,6 +552,8 @@ export const db = {
     desconto: number;
     valorTrocaSucata: number;
     valorInstalacao?: number;
+    valorComissao?: number;
+    tipoComissao?: string;
     observacao?: string;
     itens: { produtoId: string; quantidade: number }[];
   }): Promise<Sale> {
@@ -591,6 +595,10 @@ export const db = {
     }
 
     const valorInstalacao = salePayload.valorInstalacao || 0;
+    const valorComissao = salePayload.valorComissao || 0;
+    const tipoComissao = salePayload.tipoComissao || (valorComissao > 0 ? 'Outro' : undefined);
+
+    // NOTA: valorComissao NÃO afeta o total pago pelo cliente!
     const total = Math.max(0, subtotal + valorInstalacao - salePayload.desconto - salePayload.valorTrocaSucata);
     const saleId = 'vnd-' + Date.now();
     const codigoVenda = `#VND-${new Date().getFullYear()}-${String(data.sales.length + 1).padStart(3, '0')}`;
@@ -609,6 +617,8 @@ export const db = {
       desconto: salePayload.desconto,
       valorTrocaSucata: salePayload.valorTrocaSucata,
       valorInstalacao,
+      valorComissao,
+      tipoComissao,
       total,
       observacao: salePayload.observacao,
       dataVenda: new Date().toISOString(),
@@ -617,13 +627,13 @@ export const db = {
 
     data.sales.unshift(newSale);
 
-    const detalhesInstalacao = valorInstalacao > 0 ? ` (Instalação: R$ ${valorInstalacao.toFixed(2)})` : '';
+    const detalhesComissao = valorComissao > 0 ? ` (Comissão Func.: R$ ${valorComissao.toFixed(2)}${tipoComissao ? ' - ' + tipoComissao : ''})` : '';
     data.auditLogs.unshift({
       id: 'log-' + Date.now(),
       usuarioId: salePayload.usuarioId,
       usuarioNome: salePayload.usuarioNome,
       acao: 'VENDA_REGISTRADA',
-      detalhes: `Venda ${codigoVenda} registrada no valor de R$ ${total.toFixed(2)} (${salePayload.formaPagamento})${detalhesInstalacao} por ${salePayload.usuarioNome}.`,
+      detalhes: `Venda ${codigoVenda} registrada no valor de R$ ${total.toFixed(2)} (${salePayload.formaPagamento})${detalhesComissao} por ${salePayload.usuarioNome}.`,
       dataHora: new Date().toISOString()
     });
 

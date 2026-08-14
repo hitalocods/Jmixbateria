@@ -31,6 +31,8 @@ export default function POSModal({ isOpen, onClose, user, usuario, onSaleSuccess
   const [desconto, setDesconto] = useState<number>(0);
   const [valorTrocaSucata, setValorTrocaSucata] = useState<number>(0);
   const [valorInstalacao, setValorInstalacao] = useState<number>(0);
+  const [valorComissao, setValorComissao] = useState<number>(0);
+  const [tipoComissao, setTipoComissao] = useState<string>('');
   const [observacao, setObservacao] = useState('');
 
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -48,6 +50,8 @@ export default function POSModal({ isOpen, onClose, user, usuario, onSaleSuccess
       setDesconto(0);
       setValorTrocaSucata(0);
       setValorInstalacao(0);
+      setValorComissao(0);
+      setTipoComissao('');
       setObservacao('');
       setErrorMsg('');
     }
@@ -141,6 +145,8 @@ export default function POSModal({ isOpen, onClose, user, usuario, onSaleSuccess
         desconto,
         valorTrocaSucata,
         valorInstalacao,
+        valorComissao,
+        tipoComissao,
         observacao,
         itens: cart.map(item => ({
           produtoId: item.product.id,
@@ -406,20 +412,68 @@ export default function POSModal({ isOpen, onClose, user, usuario, onSaleSuccess
                 </div>
               </div>
 
-              {/* VALOR DE INSTALAÇÃO */}
-              <div className="rounded-xl border border-blue-900/60 bg-blue-950/30 p-2.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-blue-400 font-bold text-[11px]">
-                  <Wrench className="h-3.5 w-3.5" />
-                  <span>Taxa de Instalação (Opcional R$)</span>
+              {/* COMISSÃO DO FUNCIONÁRIO (MOTO 30, CARRO 35, CAMINHÃO 45) */}
+              <div className="rounded-xl border border-purple-900/60 bg-purple-950/30 p-2.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-purple-300 flex items-center gap-1">
+                    💰 Comissão do Funcionário
+                  </span>
+                  {valorComissao > 0 && (
+                    <span className="text-[10px] font-extrabold text-purple-300 bg-purple-900/80 px-2 py-0.5 rounded border border-purple-700">
+                      R$ {valorComissao.toFixed(2)} ({tipoComissao})
+                    </span>
+                  )}
                 </div>
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="R$ 0,00 (Valor da mão de obra)"
-                  value={valorInstalacao || ''}
-                  onChange={e => setValorInstalacao(parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-lg border border-blue-800 bg-[#0d172a] p-2 text-blue-200 font-bold placeholder-slate-500 text-xs"
-                />
+
+                <div className="grid grid-cols-4 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => { setValorComissao(30); setTipoComissao('Moto'); }}
+                    className={`py-1.5 px-1 rounded-lg text-[10px] font-black transition-all border text-center ${
+                      valorComissao === 30 && tipoComissao === 'Moto'
+                        ? 'bg-purple-600 text-white border-purple-400 shadow-md scale-105'
+                        : 'bg-[#111d33] text-purple-200 border-[#1e3256] hover:bg-purple-900/40'
+                    }`}
+                  >
+                    🛵 Moto<br/><span className="text-[9px] opacity-80">R$ 30</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setValorComissao(35); setTipoComissao('Carro'); }}
+                    className={`py-1.5 px-1 rounded-lg text-[10px] font-black transition-all border text-center ${
+                      valorComissao === 35 && tipoComissao === 'Carro'
+                        ? 'bg-purple-600 text-white border-purple-400 shadow-md scale-105'
+                        : 'bg-[#111d33] text-purple-200 border-[#1e3256] hover:bg-purple-900/40'
+                    }`}
+                  >
+                    🚗 Carro<br/><span className="text-[9px] opacity-80">R$ 35</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setValorComissao(45); setTipoComissao('Caminhão'); }}
+                    className={`py-1.5 px-1 rounded-lg text-[10px] font-black transition-all border text-center ${
+                      valorComissao === 45 && tipoComissao === 'Caminhão'
+                        ? 'bg-purple-600 text-white border-purple-400 shadow-md scale-105'
+                        : 'bg-[#111d33] text-purple-200 border-[#1e3256] hover:bg-purple-900/40'
+                    }`}
+                  >
+                    🚛 Caminhão<br/><span className="text-[9px] opacity-80">R$ 45</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setValorComissao(0); setTipoComissao(''); }}
+                    className={`py-1.5 px-1 rounded-lg text-[10px] font-black transition-all border text-center ${
+                      valorComissao === 0
+                        ? 'bg-[#0d172a] text-slate-400 border-slate-700'
+                        : 'bg-[#111d33] text-slate-400 border-[#1e3256] hover:bg-slate-800'
+                    }`}
+                  >
+                    ❌ Nenhuma<br/><span className="text-[9px] opacity-80">R$ 0</span>
+                  </button>
+                </div>
+                <p className="text-[9px] text-purple-300/60 italic text-center">
+                  * Não altera o valor total cobrado do cliente. Vai direto pro painel do dono.
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-2">

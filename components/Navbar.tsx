@@ -179,6 +179,7 @@ export default function Navbar({ user, sessionUser, onPOSOpen, onOpenPOS, onLogo
                   src="/logo.png"
                   alt="JMix Baterias 24h"
                   fill
+                  sizes="40px"
                   className="object-contain"
                   priority
                 />
@@ -258,7 +259,7 @@ export default function Navbar({ user, sessionUser, onPOSOpen, onOpenPOS, onLogo
             <div className="flex items-center justify-between border-b border-[#1e3256] pb-4 mb-4">
               <div className="flex items-center gap-2.5">
                 <div className="relative h-9 w-9 rounded-xl border border-[#1e3256] bg-[#111d33] p-1">
-                  <Image src="/logo.png" alt="JMix Logo" fill className="object-contain" />
+                  <Image src="/logo.png" alt="JMix Logo" fill sizes="36px" className="object-contain" />
                 </div>
                 <div>
                   <h3 className="font-black text-white text-base">JMix Baterias</h3>
